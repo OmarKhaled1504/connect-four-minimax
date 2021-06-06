@@ -1,7 +1,8 @@
 #1 FOR EMPTY SPACE
 #2 FOR RED CHIP
 #3 FOR YELLOW CHIP
-
+#j is row
+#i is column
 def state_children(state, val):
     children = []
     for i in range(0,7):
@@ -47,45 +48,85 @@ def horizontal_count(state, val):
             count += 1
     return count
 
-def diagonal_count(state, val):
-    count = 0
-    for k in range(0,6+7-2+1):
-        fourinrow = 4
-        for j in range(0,k+1):
-            i = k - j
-            if i<6 and j<7:
-                if get_chip(state[j], i) == val:
-                    #print(get_chip(state[j],i))
-                    fourinrow -= 1
-                    if fourinrow == 0:
-                        count += 1
-                else:
-                    fourinrow = 4
 
-    # for k in range(0,12):
-    #     fourinrow = 4
-    #     for i in range(0,k+1):
-    #         j = 6 + i
-    #         if i > -1 and j < 7:
-    #             print(i, j)
-    #             if get_chip(state[j], i) == val:
-    #                 #print(get_chip(state[j],i))
-    #
-    #                 fourinrow -= 1
-    #                 if fourinrow == 0:
-    #                     count += 1
-    #             else:
-    #                 fourinrow = 4
-    #     print('\n')
+def detectDiagonalLtoR(state,val):
+    k=l=m=n=o=p=4
+    count = 0
+    for i in range(0, 6):
+        if get_chip(state[i],i) == val:
+            k -= 1
+            if k == 0:
+                count +=1
+    for i in range(1,7):
+        if get_chip(state[i],i+1) == val:
+            l-=1
+            if l==0 :
+                count +=1
+    for i in range(2,7):
+        if get_chip(state[i],i+1) == val:
+            m-=1
+            if m==0 :
+                count +=1
+    for i in range(3,7):
+        if get_chip(state[i],i+1) == val:
+            n-=1
+            if n==0 :
+                count +=1
+    for i in range(0,4):
+        if get_chip(state[i+1],i) == val:
+            o-=1
+            if o==0 :
+                count +=1
+    for i in range(0,3):
+        if get_chip(state[i+2],i) == val:
+            p-=1
+            if p==0 :
+                count +=1
+    return count
+
+def detectDiagonalRtoL(state,val):
+    k=l=m=n=o=p=4
+    count = 0
+    for i in range(5, 0,-1):
+        if get_chip(state[i],i) == val:
+            k -= 1
+            if k == 0:
+                count +=1
+    for i in range(6,1,-1):
+        if get_chip(state[i],i+1) == val:
+            l-=1
+            if l==0 :
+                count +=1
+    for i in range(6,2,-1):
+        if get_chip(state[i],i+1) == val:
+            m-=1
+            if m==0 :
+                count +=1
+    for i in range(6,3,-1):
+        if get_chip(state[i],i+1) == val:
+            n-=1
+            if n==0 :
+                count +=1
+    for i in range(3,0,-1):
+        if get_chip(state[i+1],i) == val:
+            o-=1
+            if o==0 :
+                count +=1
+    for i in range(3,0,-1):
+        if get_chip(state[i+2],i) == val:
+            p-=1
+            if p==0 :
+                count +=1
     return count
 
 
+
 def red_score(state):
-    return horizontal_count(state, 2) + vertical_count(state, 2) + diagonal_count(state, 2)
+    return horizontal_count(state, 2) + vertical_count(state, 2) + detectDiagonalLtoR(state, 2) + detectDiagonalRtoL(state,2)
 
 
 def yellow_score(state):
-    return horizontal_count(state, 3) + vertical_count(state, 3) + diagonal_count(state, 3)
+    return horizontal_count(state, 3) + vertical_count(state, 3) + detectDiagonalLtoR(state, 3) + detectDiagonalRtoL(state,3)
 
 def evaluate(state):
     return red_score(state)-yellow_score(state)
@@ -151,7 +192,7 @@ def print_board(state):
         print(get_chip(state[0], j), get_chip(state[1], j), get_chip(state[2], j), get_chip(state[3], j),
               get_chip(state[4], j), get_chip(state[5], j), get_chip(state[6], j))
 
-state = [222221, 222231, 232331, 223311, 322221, 322331, 323231]
+state = [222221, 222231, 232331, 223211, 322221, 322331, 323231]
 
 #state = ['000200','000000','000000','000000','000000','000000','000000']
 
@@ -176,4 +217,15 @@ print('\n')
 state = decision(state)
 print_board(state)
 print('\n')
+state = decision(state)
+print_board(state)
+print('\n')
+state = decision(state)
+print_board(state)
+print('\n')
+state = decision(state)
+print_board(state)
+print('\n')
+print(red_score(state))
+print(yellow_score(state))
 
