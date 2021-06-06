@@ -3,6 +3,9 @@
 # 3 FOR YELLOW CHIP
 # j is row
 # i is column
+import math
+
+
 def state_children(state, val):
     children = []
     for i in range(0, 7):
@@ -56,7 +59,7 @@ def detectDiagonalLtoR(state, val):
     k = l = m = n = o = p = 4
     count = 0
     for i in range(0, 6):
-        if get_chip(state[i], i) == val:        #state[0] gets row of index 0, 2nd arg column gets coordinates of chip
+        if get_chip(state[i], i) == val:  # state[0] gets row of index 0, 2nd arg column gets coordinates of chip
             k -= 1
             if k == 0:
                 count += 1
@@ -68,35 +71,35 @@ def detectDiagonalLtoR(state, val):
             if l == 0:
                 count += 1
         else:
-            l=4
+            l = 4
     for i in range(2, 7):
         if get_chip(state[i], i + 1) == val:
             m -= 1
             if m == 0:
                 count += 1
         else:
-            m=4
+            m = 4
     for i in range(3, 7):
         if get_chip(state[i], i + 1) == val:
             n -= 1
             if n == 0:
                 count += 1
         else:
-            n=4
+            n = 4
     for i in range(0, 4):
         if get_chip(state[i + 1], i) == val:
             o -= 1
             if o == 0:
                 count += 1
         else:
-            o=4
+            o = 4
     for i in range(0, 3):
         if get_chip(state[i + 2], i) == val:
             p -= 1
             if p == 0:
                 count += 1
         else:
-            p=4
+            p = 4
     return count
 
 
@@ -158,6 +161,42 @@ def terminal_test(state):
     return 1
 
 
+# minimax with alpha beta pruning#########################
+def decisionwp(state):
+    (child, temp) = maximizewp(state, -math.inf, math.inf)
+    return child
+
+
+def minimizewp(state, alpha, beta):
+    if terminal_test(state):
+        return (None, evaluate(state))
+    (minChild, minUtility) = (None, 500)
+    for child in state_children(state, 3):
+        (temp, utility) = maximizewp(child, alpha, beta)
+        if utility < minUtility:
+            (minChild, minUtility) = (child, utility)
+        if minUtility <= alpha:
+            break
+        if minUtility < beta:
+            beta = minUtility
+    return (minChild, minUtility)
+
+
+def maximizewp(state, alpha, beta):
+    if terminal_test(state):
+        return (None, evaluate(state))
+    (maxChild, maxUtility) = (None, -500)
+    for child in state_children(state, 2):
+        (temp, utility) = minimizewp(child, alpha, beta)
+        if utility > maxUtility:
+            (maxChild, maxUtility) = (child, utility)
+        if maxUtility >= beta:
+            break
+        if maxUtility > alpha:
+            alpha = maxUtility
+    return (maxChild, maxUtility)
+#########################################################
+
 def maximize(state):
     if terminal_test(state):
         return (None, evaluate(state))
@@ -165,7 +204,7 @@ def maximize(state):
     for child in state_children(state, 2):
         (temp, utility) = minimize(child)
         if utility > maxUtility:
-            (maxChild, maxUility) = (child, utility)
+            (maxChild, maxUtility) = (child, utility)
 
     return (maxChild, maxUtility)
 
@@ -177,7 +216,7 @@ def minimize(state):
     for child in state_children(state, 3):
         (temp, utility) = maximize(child)
         if utility < minUtility:
-            (minChild, minUility) = (child, utility)
+            (minChild, minUtility) = (child, utility)
 
     return (minChild, minUtility)
 
