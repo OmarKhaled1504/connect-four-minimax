@@ -1,50 +1,204 @@
-import tkinter as tk
-from tkinter import *
-from tkinter import filedialog, Text
-import os
+import random
+from pygame.locals import *
+import numpy as connect4
+import pygame
+import sys
+import math
+from pygame import mixer
+BLUE = (0, 0, 128)  # value for blue # color of board
+BLACK = (0, 0, 0)  # value for black # color of background
+RED = (255, 100, 100)  # value for red   # color of our 2oshat
+YELLOW = (255, 255, 0)  # value for yellow  #color of ai 2oshat
+SHADOW = (192, 192, 192)
 
-import self as self
+ROW_COUNT = 6  # number of rows
+COLUMN_COUNT = 7  # number of columns
+square_size = 100  # size of square
 
+player = 0
+ai = 1
 
-def raise_frame(frame):
-    frame.tkraise()
+empty = 0
+pl_piece = 1
+ai_piece = 2
 
+square_length = 4
 
-root = Tk()
+# Setup pygame/window ---------------------------------------- #
+mainClock = pygame.time.Clock()
 
-scene1 = Frame(root)
-scene2 = Frame(root)
-
-for frame in (scene1, scene2):
-    frame.grid(column=0, row=10, sticky='news')
-
-# FRAME 1
-frame1 = tk.Frame(master=scene1, width=700, height=500, bg="#263D42")
-frame1.pack(fill=tk.X, expand=True)
-
-label_a = tk.Label(master=frame1, text="CONNECT FOUR ", bg="#263D42")
-label_a.config(font=("Courier", 24))
-label_a.place(relx=0.5, rely=0.1, anchor='center')
-
-button_a = tk.Button(master=frame1, text="Start game", padx=10, pady=5,
-                     fg="black", bg="gray", command=lambda: raise_frame(scene2))
-button_a.place(x=360, y=450,anchor='center')
-
-# FRAME 2
-
-frame2 = tk.Frame(master=scene2, width=700, height=500, bg="green")
-frame2.pack(fill=tk.X, expand=True)
-
-label_b = tk.Label(master=frame2, text="CONNECT FOUR GAME ", bg="#263D42")
-label_b.config(font=("Courier", 24))
-label_b.place(relx=0.5, rely=0.1, anchor='center')
-
-button_b = tk.Button(master=frame2, text="Go back", padx=10, pady=5,
-                     fg="black", bg="gray", command=lambda: raise_frame(scene1))
-button_b.place(x=600, y=460)
+pygame.init()
+pygame.display.set_caption('game base')
+screen = pygame.display.set_mode((650, 500), 0, 32)
+myfont = pygame.font.SysFont("monospace", 75)
 
 
-frame1.pack()
-frame2.pack()
-raise_frame(scene1)
-root.mainloop()
+# FUNCTION TO DRAW ON SCREEN
+def draw_text(text, font, color, surface, x, y):
+    textobj = font.render(text, 1, color)
+    textrect = textobj.get_rect()
+    textrect.topleft = (x, y)
+    surface.blit(textobj, textrect)
+
+
+mixer.music.load("background.wav")
+mixer.music.play(-1)
+
+click = False
+
+
+# ---------------------------------------------------------------#
+
+
+def main_menu():
+    while True:
+        pygame.display.set_caption('CONNECT 4 ')
+        screen.fill(BLACK)
+        draw_text('CONNECT FOUR', myfont, RED, screen, 40, 25)
+
+        mx, my = pygame.mouse.get_pos()
+
+        button_1 = pygame.Rect(225, 400, 200, 50)
+
+        text = myfont.render('quit', True, BLACK)
+        if button_1.collidepoint((mx, my)):
+            if click:
+                game()
+
+        pygame.draw.rect(screen, SHADOW, button_1)
+
+        click = False
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
+        pygame.display.update()
+        mainClock.tick(60)
+
+
+def game():
+    def create_board():
+        board = connect4.zeros((ROW_COUNT, COLUMN_COUNT))  # matrix of zeros 6 x 7
+        return board
+
+    def drop_piece(board, row, col, piece):
+        board[row][col] = piece
+
+    def is_valid_location(board, col):
+        return board[ROW_COUNT - 1][col] == 0
+
+    def get_next_open_row(board, col):
+        for r in range(ROW_COUNT):
+            if board[r][col] == 0:
+                return r
+
+    def print_board(board):
+        print(connect4.flip(board, 0))
+
+    def draw_board(board):
+        for c in range(COLUMN_COUNT):  # drawing the rectangle of the board
+            for r in range(ROW_COUNT):
+                pygame.draw.rect(screen, BLUE,
+                                 (c * square_size, r * square_size + square_size, square_size, square_size))
+                pygame.draw.circle(screen, SHADOW, (
+                    int(c * square_size + square_size / 2), int(r * square_size + square_size + square_size / 2)),
+                                   RADIUS)  # drawing the circles inside rectangle of the board
+
+        for c in range(COLUMN_COUNT):  # adds in the matrix updates list
+            for r in range(ROW_COUNT):
+                if board[r][c] == pl_piece:
+                    pygame.draw.circle(screen, RED, (
+                        int(c * square_size + square_size / 2), height - int(r * square_size + square_size / 2)),
+                                       RADIUS)
+                elif board[r][c] == ai_piece:
+                    pygame.draw.circle(screen, YELLOW, (
+                        int(c * square_size + square_size / 2), height - int(r * square_size + square_size / 2)),
+                                       RADIUS)
+        pygame.display.update()
+
+    def get_valid_locations(board):
+        valid_locations = []
+        for col in range(COLUMN_COUNT):
+            if is_valid_location(board, col):
+                valid_locations.append(col)
+        return valid_locations
+
+    board = create_board()
+    game_over = False
+    width = COLUMN_COUNT * square_size
+    height = (ROW_COUNT + 1) * square_size
+
+    size = (width, height)
+    RADIUS = int(square_size / 2 - 5)
+    screen = pygame.display.set_mode(size)
+    draw_board(board)
+    pygame.display.update()
+
+    turn = random.randint(player, ai)  # makes a random start of player or ai
+    while not game_over:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+
+            if event.type == pygame.MOUSEMOTION:
+                pygame.draw.rect(screen, BLACK, (0, 0, width, square_size))  # BETRG3HA BLACK
+                posx = event.pos[0]
+                if turn == player:
+                    pygame.draw.circle(screen, RED, (posx, int(square_size / 2)), RADIUS)
+            pygame.display.update()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pygame.draw.rect(screen, BLACK, (0, 0, width, square_size))
+                # print(event.pos)
+                # Ask for Player 1 Input
+                if turn == player:
+                    posx = event.pos[0]
+                    col = int(math.floor(posx / square_size))
+
+                    if is_valid_location(board, col):
+                        row = get_next_open_row(board, col)
+                        drop_piece(board, row, col, pl_piece)
+
+                        # if main.red_score(board)>>main.yellow_score(board):
+                        #     label = myfont.render("Player 1 wins!!", 1, RED)
+                        #     screen.blit(label, (40, 10))
+                        #     game_over = True
+                        turn += 1
+                        turn = turn % 2
+                        print_board(board)
+                        draw_board(board)
+                # # ai Input
+        if turn == ai and not game_over:
+
+            col = random.randint(0, COLUMN_COUNT - 1)
+            # hot hena el functions ely hatnady 3aleha
+            if is_valid_location(board, col):
+                pygame.time.wait(300)
+                row = get_next_open_row(board, col)
+                drop_piece(board, row, col, ai_piece)
+
+                # if main.red_score(board)<<main.yellow_score(board):
+                #     label = myfont.render("Player 2 wins!!", 1, YELLOW)
+                #     screen.blit(label, (40, 10))
+                #     game_over = True
+
+                print_board(board)
+                draw_board(board)
+                # BET5ALY EL TURN YA 0 YA 1
+                turn += 1
+                turn = turn % 2
+        if game_over:
+            pygame.time.wait(3000)  # WAITS 3000 MILISECONDS
+
+
+main_menu()
+
