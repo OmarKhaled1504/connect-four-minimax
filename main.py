@@ -39,9 +39,9 @@ def state_children(state, val):
                 children.append(child)
                 indices.append(index)
                 break
-    indices1 = tuple(indices)
 
-    return (children, indices1)
+
+    return (children, indices)
 
 
 def detect_four_vertically(column, val):
