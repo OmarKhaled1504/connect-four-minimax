@@ -213,10 +213,9 @@ def game():
                 # BET5ALY EL TURN YA 0 YA 1
                 turn += 1
                 turn = turn % 2
-       # if game_over:
-            #pygame.time.wait(5000)  # WAITS 3000 MILISECONDS
-            #sys.exit()
+        if game_over:
+            pygame.time.wait(5000)  # WAITS 3000 MILISECONDS
+            sys.exit()
 
 
 main_menu()
-

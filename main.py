@@ -4,8 +4,6 @@
 # j is row
 # i is column
 import math
-
-
 class Game:
     def __init__(self):
         self.red_score = 0
@@ -15,7 +13,6 @@ class Game:
     def start(self):
         board = ['000000', '000000', '000000', '000000', '000000', '000000', '000000']
         return board
-
     # def over(self):
     #     if terminal_test(board):
     #         return 1
@@ -28,22 +25,28 @@ class Game:
             return 2
         else:
             return 0
+#THIS CLASS IS ONLY USED TO TRANSFER THE INDEX OF THE AI'S MOVE TO THE GUI
+class Child:
+    def __init__(self, state, index):
+        self.state = state
+        self.index = index
 
-
-# TAKES AN INPUT STATE AND GENERATES ALL POSSIBLE MOVES FROM THIS STATE
+#TAKES AN INPUT STATE AND GENERATES ALL POSSIBLE MOVES FROM THIS STATE
 def state_children(state, val):
     children = []
     indices = []
     for i in range(0, 7):
         for j in range(0, 6):
             if get_chip(state[i], j) == '0':
-                child = set_chip(state, i, j, val)
+                temp = set_chip(state, i, j, val)
                 index = (i, j)
+                child = Child(temp, index)
                 children.append(child)
-                indices.append(index)
+
                 break
 
-    return (children, indices)
+
+    return (children)
 
 
 def detect_four_vertically(column, val):
@@ -144,30 +147,33 @@ def terminal_test(state):
     return 1
 
 
-# minimax with alpha beta pruning#########################
+# ********************************** MINIMAX WITH ALPHA BETA PRUNING *****************************************************
+
+
 def decisionwp(state):
-    (child, temp, index) = maximizewp(state, -math.inf, math.inf, 8)
+
+    (child, temp, index) = maximizewp(state, -math.inf, math.inf, 6)
     return (child, index)
 
 
 def minimizewp(state, alpha, beta, steps_count):
     if terminal_test(state):
-        return (None, evaluate(state), None)
+        return (None, evaluate(state),None)
     if steps_count == 0:
-        return (None, evaluate(state), None)
+        return (None, evaluate(state),None)
     (minChild, minUtility, index) = (None, 500, None)
     steps_count -= 1
-    (children, indices) = state_children(state, '2')
-    i = 0
-    for child in children:
-        (temp, utility, index) = maximizewp(child, alpha, beta, steps_count)
+
+    for child in state_children(state, '2'):
+        (temp, utility, temp2) = maximizewp(child.state, alpha, beta, steps_count)
         if utility < minUtility:
-            (minChild, minUtility, index) = (child, utility, indices[i])
+            (minChild, minUtility, index) = (child.state, utility, child.index)
         if minUtility <= alpha:
             break
         if minUtility < beta:
             beta = minUtility
-        i += 1
+
+
     return (minChild, minUtility, index)
 
 
@@ -179,63 +185,61 @@ def maximizewp(state, alpha, beta, steps_count):
 
     (maxChild, maxUtility, index) = (None, -500, None)
     steps_count -= 1
-    (children, indices) = state_children(state, '2')
-    i = 0
-    for child in children:
-        (temp, utility, index) = minimizewp(child, alpha, beta, steps_count)
+    for child in state_children(state, '2'):
+        (temp, utility, temp2) = minimizewp(child.state, alpha, beta, steps_count)
         if utility > maxUtility:
-            (maxChild, maxUtility, index) = (child, utility, indices[i])
+            (maxChild, maxUtility, index) = (child.state, utility, child.index)
         if maxUtility >= beta:
             break
         if maxUtility > alpha:
             alpha = maxUtility
-        i += 1
+
+
     return (maxChild, maxUtility, index)
 
 
-#########################################################
+#*************************************** MINIMAX *******************************************************
 
 def maximize(state, steps_count):
     if terminal_test(state):
-        return (None, evaluate(state))
+        return (None, evaluate(state), None)
     if steps_count == 0:
-        return (None, evaluate(state))
+        return (None, evaluate(state), None)
 
-    (maxChild, maxUtility) = (None, -500)
+    (maxChild, maxUtility, index) = (None, -500, None)
     steps_count -= 1
     for child in state_children(state, '2'):
-        (temp, utility) = minimize(child, steps_count)
+        (temp, utility, temp2) = minimize(child.state,steps_count)
         if utility > maxUtility:
-            (maxChild, maxUtility) = (child, utility)
+            (maxChild, maxUtility, index) = (child.state, utility, child.index)
 
-    return (maxChild, maxUtility)
+    return (maxChild, maxUtility, index)
 
 
-def minimize(state, steps_count):
+def minimize(state,steps_count):
     if terminal_test(state):
-        return (None, evaluate(state))
+        return (None, evaluate(state), None)
     if steps_count == 0:
-        return (None, evaluate(state))
+        return (None, evaluate(state), None)
 
-    (minChild, minUtility) = (None, 500)
+    (minChild, minUtility, index) = (None, 500, None)
     steps_count -= 1
     for child in state_children(state, '1'):
-        (temp, utility) = maximize(child, steps_count)
+        (temp, utility, temp2) = maximize(child.state, steps_count)
         if utility < minUtility:
-            (minChild, minUtility) = (child, utility)
+            (minChild, minUtility, index) = (child.state, utility, child.index)
 
-    return (minChild, minUtility)
+    return (minChild, minUtility, index)
 
 
 def decision(state):
-    (child, temp) = maximize(state, 5)
-    return child
+    (child, temp, index) = maximize(state, 5)
+    return (child, index)
 
 
 def get_chip(column, j):
     word = split(column)
     return word[j]
-    # return int(column / (10 ** (5 - j)) % 10)
 
 
 def split(word):
@@ -262,47 +266,30 @@ def set_chip(state, i, j, val):
 
 def print_board(state):
     for j in range(5, -1, -1):
-        print(get_chip(state[0], j), '', get_chip(state[1], j), '', get_chip(state[2], j), '', get_chip(state[3], j),
-              '',
+        print(get_chip(state[0], j), '', get_chip(state[1], j), '', get_chip(state[2], j), '', get_chip(state[3], j), '',
               get_chip(state[4], j), '', get_chip(state[5], j), '', get_chip(state[6], j))
 
 
+
+
+# game = Game()
+# board = game.start()
+#
 # while not terminal_test(board):
-#     print('ENTER YOUR MOVE\n')
+#     print('\nENTER YOUR MOVE\n')
 #     j = int(input('ROW: '))
 #     i = int(input('\nCOLUMN: '))
 #     board = set_chip(board, i, j, '1')
-#     print("YOUR MOVE\n")
+#     print("YOUR MOVE")
 #     print_board(board)
 #     (board, index) = decisionwp(board)
-#     print("BOTS'S MOVE\n")
+#     print(index)
+#     print("\nBOTS'S MOVE")
 #     print_board(board)
 
 
-state = ['111111', '111111', '111111', '111111', '000000', '000000', '000000']
-(children, indices) = state_children(state, '1')
-print_board(state)
-print(downtoup_diagonal_count(state, '1'))
 
-# for item in children:
-#     print_board(item)
-#     print('\n')
-# print(indices)
-#
-# print_board(state)
-# print('\n')
-# state = decisionwp(state)
-# print_board(state)
-# print('\n')
-#
-# state = decisionwp(state)
-# print_board(state)
-# print('\n')
-#
-# state = decisionwp(state)
-# print_board(state)
-# print('\n')
-#
-# state = decision(state)
-# print_board(state)
-# print('\n')
+
+
+# state = ['121212', '122222', '120000', '100000', '120000', '100000', '111000']
+# (children, indices) = state_children(state, '1')
