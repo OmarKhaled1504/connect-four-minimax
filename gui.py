@@ -7,6 +7,7 @@ import math
 import main
 
 from pygame import mixer
+
 BLUE = (0, 0, 128)  # value for blue # color of board
 BLACK = (0, 0, 0)  # value for black # color of background
 RED = (255, 100, 100)  # value for red   # color of our 2oshat
@@ -103,7 +104,8 @@ def game():
                 return r
 
     def print_board(board):
-        print(connect4.flip(board, 0))
+        print(connect4.flip(board, 0))  # board after flipping
+        print(board)  # orignal board
 
     def draw_board(board):
         for c in range(COLUMN_COUNT):  # drawing the rectangle of the board
@@ -215,8 +217,7 @@ def game():
                 turn += 1
                 turn = turn % 2
         if game_over:
-            pygame.time.wait(3000)  # WAITS 3000 MILISECONDS
+            pygame.time.wait(3000)  # WAITS 3000 MILISECONDS to announce winner
 
 
 main_menu()
-
