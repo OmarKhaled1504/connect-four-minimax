@@ -4,6 +4,8 @@
 # j is row
 # i is column
 import math
+
+
 class Game:
     def __init__(self):
         self.red_score = 0
@@ -13,6 +15,7 @@ class Game:
     def start(self):
         board = ['000000', '000000', '000000', '000000', '000000', '000000', '000000']
         return board
+
     # def over(self):
     #     if terminal_test(board):
     #         return 1
@@ -26,26 +29,21 @@ class Game:
         else:
             return 0
 
-class Child:
-    def __init__(self, state, index):
-        self.state = state
-        self.index = index
-#TAKES AN INPUT STATE AND GENERATES ALL POSSIBLE MOVES FROM THIS STATE
+
+# TAKES AN INPUT STATE AND GENERATES ALL POSSIBLE MOVES FROM THIS STATE
 def state_children(state, val):
     children = []
     indices = []
     for i in range(0, 7):
         for j in range(0, 6):
             if get_chip(state[i], j) == '0':
-                temp = set_chip(state, i, j, val)
+                child = set_chip(state, i, j, val)
                 index = (i, j)
-                child = Child(temp, index)
                 children.append(child)
-
+                indices.append(index)
                 break
 
-
-    return (children)
+    return (children, indices)
 
 
 def detect_four_vertically(column, val):
@@ -169,45 +167,86 @@ def detectDiagonalRtoL(state, val):
                 count += 1
     return count
 
-def diagonal_count(state, val):
-    count = 0
-    for k in range(0,6+7-2+1):
-        fourinrow = 4
-        for j in range(0,k+1):
-            i = k - j
-            if i<6 and j<7:
-                if get_chip(state[j], i) == val:
-                    #print(get_chip(state[j],i))
-                    fourinrow -= 1
-                    if fourinrow == 0:
-                        count += 1
-                else:
-                    fourinrow = 4
+#
+# def diagonal_count(state, val):
+#     count = 0
+#     for k in range(0, 6 + 7 - 2 + 1):
+#         fourinrow = 4
+#         for j in range(0, k + 1):
+#             i = k - j
+#             if i < 6 and j < 7:
+#                 if get_chip(state[j], i) == val:
+#                     # print(get_chip(state[j],i))
+#                     fourinrow -= 1
+#                     if fourinrow == 0:
+#                         count += 1
+#                 else:
+#                     fourinrow = 4
+#
+#     # for k in range(0,12):
+#     #     fourinrow = 4
+#     #     for i in range(0,k+1):
+#     #         j = 6 + i
+#     #         if i > -1 and j < 7:
+#     #             print(i, j)
+#     #             if get_chip(state[j], i) == val:
+#     #                 #print(get_chip(state[j],i))
+#     #
+#     #                 fourinrow -= 1
+#     #                 if fourinrow == 0:
+#     #                     count += 1
+#     #             else:
+#     #                 fourinrow = 4
+#     #     print('\n')
+#     return count
 
-    # for k in range(0,12):
-    #     fourinrow = 4
-    #     for i in range(0,k+1):
-    #         j = 6 + i
-    #         if i > -1 and j < 7:
-    #             print(i, j)
-    #             if get_chip(state[j], i) == val:
-    #                 #print(get_chip(state[j],i))
-    #
-    #                 fourinrow -= 1
-    #                 if fourinrow == 0:
-    #                     count += 1
-    #             else:
-    #                 fourinrow = 4
-    #     print('\n')
-    return count
+
+def downtoup_diagonal_count(state, value):
+    connected_fours = 0
+    for j in range(4):
+        for i in range(3):
+            jd = j
+            id = i
+            count = 0
+            four_in_a_row = True
+            while count < 4:
+                if state[jd][id] != value:
+                    four_in_a_row = False
+                    break
+                count += 1
+                jd += 1
+                id += 1
+            if four_in_a_row:
+                connected_fours += 1
+    return connected_fours
+
+
+def uptodown_diagonal_count(state, value):
+    connected_fours = 0
+    for j in range(4):
+        for i in range(3, 6):
+            jd = j
+            id = i
+            count = 0
+            four_in_a_row = True
+            while count < 4:
+                print(jd,id)
+                if state[jd][id] != value:
+                    four_in_a_row = False
+                    break
+                count += 1
+                jd += 1
+                id -= 1
+            if four_in_a_row:
+                connected_fours += 1
+    return connected_fours
 
 def red_score(state):
-    return horizontal_count(state, '1') + vertical_count(state, '1') + diagonal_count(state,'1')
-
+    return horizontal_count(state, '1') + vertical_count(state, '1') + uptodown_diagonal_count(state,'1') + downtoup_diagonal_count(state,'1')
 
 
 def yellow_score(state):
-    return horizontal_count(state, '2') + vertical_count(state, '2') + diagonal_count(state, '2')
+    return horizontal_count(state, '2') + vertical_count(state, '2') + uptodown_diagonal_count(state,'2') + downtoup_diagonal_count(state,'2')
 
 
 def evaluate(state):
@@ -224,29 +263,28 @@ def terminal_test(state):
 
 # minimax with alpha beta pruning#########################
 def decisionwp(state):
-
-    (child, temp, index) = maximizewp(state, -math.inf, math.inf, 7)
+    (child, temp, index) = maximizewp(state, -math.inf, math.inf, 8)
     return (child, index)
 
 
 def minimizewp(state, alpha, beta, steps_count):
     if terminal_test(state):
-        return (None, evaluate(state),None)
+        return (None, evaluate(state), None)
     if steps_count == 0:
-        return (None, evaluate(state),None)
+        return (None, evaluate(state), None)
     (minChild, minUtility, index) = (None, 500, None)
     steps_count -= 1
-
-    for child in state_children(state, '2'):
-        (temp, utility, temp2) = maximizewp(child.state, alpha, beta, steps_count)
+    (children, indices) = state_children(state, '2')
+    i = 0
+    for child in children:
+        (temp, utility, index) = maximizewp(child, alpha, beta, steps_count)
         if utility < minUtility:
-            (minChild, minUtility, index) = (child.state, utility, child.index)
+            (minChild, minUtility, index) = (child, utility, indices[i])
         if minUtility <= alpha:
             break
         if minUtility < beta:
             beta = minUtility
-
-
+        i += 1
     return (minChild, minUtility, index)
 
 
@@ -258,17 +296,20 @@ def maximizewp(state, alpha, beta, steps_count):
 
     (maxChild, maxUtility, index) = (None, -500, None)
     steps_count -= 1
-    for child in state_children(state, '2'):
-        (temp, utility, temp2) = minimizewp(child.state, alpha, beta, steps_count)
+    (children, indices) = state_children(state, '2')
+    i = 0
+    for child in children:
+        (temp, utility, index) = minimizewp(child, alpha, beta, steps_count)
         if utility > maxUtility:
-            (maxChild, maxUtility, index) = (child.state, utility, child.index)
+            (maxChild, maxUtility, index) = (child, utility, indices[i])
         if maxUtility >= beta:
             break
         if maxUtility > alpha:
             alpha = maxUtility
-
-
+        i += 1
     return (maxChild, maxUtility, index)
+
+
 #########################################################
 
 def maximize(state, steps_count):
@@ -280,14 +321,14 @@ def maximize(state, steps_count):
     (maxChild, maxUtility) = (None, -500)
     steps_count -= 1
     for child in state_children(state, '2'):
-        (temp, utility) = minimize(child,steps_count)
+        (temp, utility) = minimize(child, steps_count)
         if utility > maxUtility:
             (maxChild, maxUtility) = (child, utility)
 
     return (maxChild, maxUtility)
 
 
-def minimize(state,steps_count):
+def minimize(state, steps_count):
     if terminal_test(state):
         return (None, evaluate(state))
     if steps_count == 0:
@@ -311,6 +352,7 @@ def decision(state):
 def get_chip(column, j):
     word = split(column)
     return word[j]
+    # return int(column / (10 ** (5 - j)) % 10)
 
 
 def split(word):
@@ -337,35 +379,47 @@ def set_chip(state, i, j, val):
 
 def print_board(state):
     for j in range(5, -1, -1):
-        print(get_chip(state[0], j), '', get_chip(state[1], j), '', get_chip(state[2], j), '', get_chip(state[3], j), '',
+        print(get_chip(state[0], j), '', get_chip(state[1], j), '', get_chip(state[2], j), '', get_chip(state[3], j),
+              '',
               get_chip(state[4], j), '', get_chip(state[5], j), '', get_chip(state[6], j))
 
 
-
-
-# game = Game()
-# board = game.start()
-#
 # while not terminal_test(board):
-#     print('\nENTER YOUR MOVE\n')
+#     print('ENTER YOUR MOVE\n')
 #     j = int(input('ROW: '))
 #     i = int(input('\nCOLUMN: '))
 #     board = set_chip(board, i, j, '1')
-#     print("YOUR MOVE")
+#     print("YOUR MOVE\n")
 #     print_board(board)
 #     (board, index) = decisionwp(board)
-#     print(index)
-#     print("\nBOTS'S MOVE")
+#     print("BOTS'S MOVE\n")
 #     print_board(board)
 
 
+state = ['111111', '111111', '111111', '111111', '000000', '000000', '000000']
+(children, indices) = state_children(state, '1')
+print_board(state)
+print(downtoup_diagonal_count(state,'1'))
 
-
-
-# state = ['121212', '122222', '120000', '100000', '120000', '100000', '111000']
-# (children, indices) = state_children(state, '1')
-
-
-
-
-
+# for item in children:
+#     print_board(item)
+#     print('\n')
+# print(indices)
+#
+# print_board(state)
+# print('\n')
+# state = decisionwp(state)
+# print_board(state)
+# print('\n')
+#
+# state = decisionwp(state)
+# print_board(state)
+# print('\n')
+#
+# state = decisionwp(state)
+# print_board(state)
+# print('\n')
+#
+# state = decision(state)
+# print_board(state)
+# print('\n')
