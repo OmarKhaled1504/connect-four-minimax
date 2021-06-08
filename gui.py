@@ -4,6 +4,8 @@ import numpy as connect4
 import pygame
 import sys
 import math
+import main
+
 from pygame import mixer
 BLUE = (0, 0, 128)  # value for blue # color of board
 BLACK = (0, 0, 0)  # value for black # color of background
@@ -41,8 +43,8 @@ def draw_text(text, font, color, surface, x, y):
     surface.blit(textobj, textrect)
 
 
-mixer.music.load("background.wav")
-mixer.music.play(-1)
+# mixer.music.load("background.wav")
+# mixer.music.play(-1)
 
 click = False
 
@@ -142,7 +144,12 @@ def game():
     draw_board(board)
     pygame.display.update()
 
-    turn = random.randint(player, ai)  # makes a random start of player or ai
+    #turn = random.randint(player, ai)  # makes a random start of player or ai
+    turn = 0
+    game = main.Game()
+    state = game.start()
+
+    main.print_board(state)
     while not game_over:
 
         for event in pygame.event.get():
@@ -167,14 +174,17 @@ def game():
                     if is_valid_location(board, col):
                         row = get_next_open_row(board, col)
                         drop_piece(board, row, col, pl_piece)
-
+                        state = main.set_chip(state, col, row, '1')
+                        print("PLAYER TURN")
+                        main.print_board(state)
+                        print('\n')
                         # if main.red_score(board)>>main.yellow_score(board):
                         #     label = myfont.render("Player 1 wins!!", 1, RED)
                         #     screen.blit(label, (40, 10))
                         #     game_over = True
                         turn += 1
                         turn = turn % 2
-                        print_board(board)
+                        #print_board(board)
                         draw_board(board)
                 # # ai Input
         if turn == ai and not game_over:
@@ -182,17 +192,25 @@ def game():
             col = random.randint(0, COLUMN_COUNT - 1)
             # hot hena el functions ely hatnady 3aleha
             if is_valid_location(board, col):
-                pygame.time.wait(300)
+                pygame.time.wait(100)
                 row = get_next_open_row(board, col)
-                drop_piece(board, row, col, ai_piece)
+                (state, index) = main.decisionwp(state)
+                print(index)
+                i = index[0]
+                j = index[1]
+
+                drop_piece(board, j, i, ai_piece)
 
                 # if main.red_score(board)<<main.yellow_score(board):
                 #     label = myfont.render("Player 2 wins!!", 1, YELLOW)
                 #     screen.blit(label, (40, 10))
                 #     game_over = True
 
-                print_board(board)
+                #print_board(board)
                 draw_board(board)
+                print("AI TURN")
+                main.print_board(state)
+                print('\n')
                 # BET5ALY EL TURN YA 0 YA 1
                 turn += 1
                 turn = turn % 2

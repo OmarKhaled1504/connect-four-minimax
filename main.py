@@ -1,20 +1,47 @@
-# 1 FOR EMPTY SPACE
-# 2 FOR RED CHIP
-# 3 FOR YELLOW CHIP
+# 0 FOR EMPTY SPACE
+# 1 FOR RED CHIP
+# 2 FOR YELLOW CHIP
 # j is row
 # i is column
 import math
+class Game:
+    def __init__(self):
+        self.red_score = 0
+        self.yellow_score = 0
+        self.board = []
+
+    def start(self):
+        board = ['000000', '000000', '000000', '000000', '000000', '000000', '000000']
+        return board
+    # def over(self):
+    #     if terminal_test(board):
+    #         return 1
+    #     else:
+    #         return 0
+    def winner(self):
+        if self.red_score > self.yellow_score:
+            return 1
+        elif self.red_score < self.yellow_score:
+            return 2
+        else:
+            return 0
 
 
+#TAKES AN INPUT STATE AND GENERATES ALL POSSIBLE MOVES FROM THIS STATE
 def state_children(state, val):
     children = []
+    indices = []
     for i in range(0, 7):
         for j in range(0, 6):
-            if get_chip(state[i], j) == 1:
+            if get_chip(state[i], j) == '0':
                 child = set_chip(state, i, j, val)
+                index = (i, j)
                 children.append(child)
+                indices.append(index)
                 break
-    return children
+    indices1 = tuple(indices)
+
+    return (children, indices1)
 
 
 def detect_four_vertically(column, val):
@@ -138,15 +165,45 @@ def detectDiagonalRtoL(state, val):
                 count += 1
     return count
 
+def diagonal_count(state, val):
+    count = 0
+    for k in range(0,6+7-2+1):
+        fourinrow = 4
+        for j in range(0,k+1):
+            i = k - j
+            if i<6 and j<7:
+                if get_chip(state[j], i) == val:
+                    #print(get_chip(state[j],i))
+                    fourinrow -= 1
+                    if fourinrow == 0:
+                        count += 1
+                else:
+                    fourinrow = 4
+
+    # for k in range(0,12):
+    #     fourinrow = 4
+    #     for i in range(0,k+1):
+    #         j = 6 + i
+    #         if i > -1 and j < 7:
+    #             print(i, j)
+    #             if get_chip(state[j], i) == val:
+    #                 #print(get_chip(state[j],i))
+    #
+    #                 fourinrow -= 1
+    #                 if fourinrow == 0:
+    #                     count += 1
+    #             else:
+    #                 fourinrow = 4
+    #     print('\n')
+    return count
 
 def red_score(state):
-    return horizontal_count(state, 2) + vertical_count(state, 2) + detectDiagonalLtoR(state, 2) + detectDiagonalRtoL(
-        state, 2)
+    return horizontal_count(state, '1') + vertical_count(state, '1') + diagonal_count(state,'1')
+
 
 
 def yellow_score(state):
-    return horizontal_count(state, 3) + vertical_count(state, 3) + detectDiagonalLtoR(state, 3) + detectDiagonalRtoL(
-        state, 3)
+    return horizontal_count(state, '2') + vertical_count(state, '2') + diagonal_count(state, '2')
 
 
 def evaluate(state):
@@ -156,65 +213,87 @@ def evaluate(state):
 def terminal_test(state):
     for i in range(0, 7):
         for j in range(0, 6):
-            if get_chip(state[i], j) == 1:
+            if get_chip(state[i], j) == '0':
                 return 0
     return 1
 
 
 # minimax with alpha beta pruning#########################
 def decisionwp(state):
-    (child, temp) = maximizewp(state, -math.inf, math.inf)
-    return child
+
+    (child, temp, index) = maximizewp(state, -math.inf, math.inf, 8)
+    return (child, index)
 
 
-def minimizewp(state, alpha, beta):
+def minimizewp(state, alpha, beta, steps_count):
     if terminal_test(state):
-        return (None, evaluate(state))
-    (minChild, minUtility) = (None, 500)
-    for child in state_children(state, 3):
-        (temp, utility) = maximizewp(child, alpha, beta)
+        return (None, evaluate(state),None)
+    if steps_count == 0:
+        return (None, evaluate(state),None)
+    (minChild, minUtility, index) = (None, 500, None)
+    steps_count -= 1
+    (children, indices) = state_children(state, '2')
+    i = 0
+    for child in children:
+        (temp, utility, index) = maximizewp(child, alpha, beta, steps_count)
         if utility < minUtility:
-            (minChild, minUtility) = (child, utility)
+            (minChild, minUtility, index) = (child, utility, indices[i])
         if minUtility <= alpha:
             break
         if minUtility < beta:
             beta = minUtility
-    return (minChild, minUtility)
+        i += 1
+    return (minChild, minUtility, index)
 
 
-def maximizewp(state, alpha, beta):
+def maximizewp(state, alpha, beta, steps_count):
     if terminal_test(state):
-        return (None, evaluate(state))
-    (maxChild, maxUtility) = (None, -500)
-    for child in state_children(state, 2):
-        (temp, utility) = minimizewp(child, alpha, beta)
+        return (None, evaluate(state), None)
+    if steps_count == 0:
+        return (None, evaluate(state), None)
+
+    (maxChild, maxUtility, index) = (None, -500, None)
+    steps_count -= 1
+    (children, indices) = state_children(state, '2')
+    i = 0
+    for child in children:
+        (temp, utility, index) = minimizewp(child, alpha, beta, steps_count)
         if utility > maxUtility:
-            (maxChild, maxUtility) = (child, utility)
+            (maxChild, maxUtility, index) = (child, utility, indices[i])
         if maxUtility >= beta:
             break
         if maxUtility > alpha:
             alpha = maxUtility
-    return (maxChild, maxUtility)
+        i += 1
+    return (maxChild, maxUtility, index)
 #########################################################
 
-def maximize(state):
+def maximize(state, steps_count):
     if terminal_test(state):
         return (None, evaluate(state))
+    if steps_count == 0:
+        return (None, evaluate(state))
+
     (maxChild, maxUtility) = (None, -500)
-    for child in state_children(state, 2):
-        (temp, utility) = minimize(child)
+    steps_count -= 1
+    for child in state_children(state, '2'):
+        (temp, utility) = minimize(child,steps_count)
         if utility > maxUtility:
             (maxChild, maxUtility) = (child, utility)
 
     return (maxChild, maxUtility)
 
 
-def minimize(state):
+def minimize(state,steps_count):
     if terminal_test(state):
         return (None, evaluate(state))
+    if steps_count == 0:
+        return (None, evaluate(state))
+
     (minChild, minUtility) = (None, 500)
-    for child in state_children(state, 3):
-        (temp, utility) = maximize(child)
+    steps_count -= 1
+    for child in state_children(state, '1'):
+        (temp, utility) = maximize(child, steps_count)
         if utility < minUtility:
             (minChild, minUtility) = (child, utility)
 
@@ -222,12 +301,14 @@ def minimize(state):
 
 
 def decision(state):
-    (child, temp) = maximize(state)
+    (child, temp) = maximize(state, 5)
     return child
 
 
 def get_chip(column, j):
-    return int(column / (10 ** (5 - j)) % 10)
+    word = split(column)
+    return word[j]
+    #return int(column / (10 ** (5 - j)) % 10)
 
 
 def split(word):
@@ -246,51 +327,62 @@ def listToString(s):
 
 def set_chip(state, i, j, val):
     new_state = state.copy()
-    x = split(str(new_state[i]))
+    x = split(new_state[i])
     x[j] = str(val)
-    new_state[i] = int(listToString(x))
+    new_state[i] = listToString(x)
     return new_state
 
 
 def print_board(state):
     for j in range(5, -1, -1):
-        print(get_chip(state[0], j), get_chip(state[1], j), get_chip(state[2], j), get_chip(state[3], j),
-              get_chip(state[4], j), get_chip(state[5], j), get_chip(state[6], j))
+        print(get_chip(state[0], j), '', get_chip(state[1], j), '', get_chip(state[2], j), '', get_chip(state[3], j), '',
+              get_chip(state[4], j), '', get_chip(state[5], j), '', get_chip(state[6], j))
 
 
-state = [222221, 222231, 232331, 223211, 322221, 322331, 323231]
 
-# state = ['000200','000000','000000','000000','000000','000000','000000']
 
-list1 = state_children(state, 3)
-print(red_score(state))
-print(yellow_score(state))
 
-print_board(state)
-print('\n')
-state = decision(state)
-print_board(state)
-print('\n')
-state = decision(state)
-print_board(state)
-print('\n')
-state = decision(state)
-print_board(state)
-print('\n')
-state = decision(state)
-print_board(state)
-print('\n')
-state = decision(state)
-print_board(state)
-print('\n')
-state = decision(state)
-print_board(state)
-print('\n')
-state = decision(state)
-print_board(state)
-print('\n')
-state = decision(state)
-print_board(state)
-print('\n')
-print(red_score(state))
-print(yellow_score(state))
+
+# while not terminal_test(board):
+#     print('ENTER YOUR MOVE\n')
+#     j = int(input('ROW: '))
+#     i = int(input('\nCOLUMN: '))
+#     board = set_chip(board, i, j, '1')
+#     print("YOUR MOVE\n")
+#     print_board(board)
+#     (board, index) = decisionwp(board)
+#     print("BOTS'S MOVE\n")
+#     print_board(board)
+
+
+
+
+
+state = ['121212', '122222', '120000', '100000', '120000', '100000', '111000']
+(children, indices) = state_children(state, '1')
+
+for item in children:
+    print_board(item)
+    print('\n')
+print(indices)
+#
+# print_board(state)
+# print('\n')
+# state = decisionwp(state)
+# print_board(state)
+# print('\n')
+#
+# state = decisionwp(state)
+# print_board(state)
+# print('\n')
+#
+# state = decisionwp(state)
+# print_board(state)
+# print('\n')
+#
+# state = decision(state)
+# print_board(state)
+# print('\n')
+
+
+
