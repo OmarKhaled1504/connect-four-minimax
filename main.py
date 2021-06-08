@@ -84,123 +84,6 @@ def horizontal_count(state, val):
     return count
 
 
-def detectDiagonalLtoR(state, val):
-    k = l = m = n = o = p = 4
-    count = 0
-    for i in range(0, 6):
-        if get_chip(state[i], i) == val:  # state[0] gets row of index 0, 2nd arg column gets coordinates of chip
-            k -= 1
-            if k == 0:
-                count += 1
-        else:
-            k = 4
-    for i in range(1, 7):
-        if get_chip(state[i], i + 1) == val:
-            l -= 1
-            if l == 0:
-                count += 1
-        else:
-            l = 4
-    for i in range(2, 7):
-        if get_chip(state[i], i + 1) == val:
-            m -= 1
-            if m == 0:
-                count += 1
-        else:
-            m = 4
-    for i in range(3, 7):
-        if get_chip(state[i], i + 1) == val:
-            n -= 1
-            if n == 0:
-                count += 1
-        else:
-            n = 4
-    for i in range(0, 4):
-        if get_chip(state[i + 1], i) == val:
-            o -= 1
-            if o == 0:
-                count += 1
-        else:
-            o = 4
-    for i in range(0, 3):
-        if get_chip(state[i + 2], i) == val:
-            p -= 1
-            if p == 0:
-                count += 1
-        else:
-            p = 4
-    return count
-
-
-def detectDiagonalRtoL(state, val):
-    k = l = m = n = o = p = 4
-    count = 0
-    for i in range(5, 0, -1):
-        if get_chip(state[i], i) == val:
-            k -= 1
-            if k == 0:
-                count += 1
-    for i in range(6, 1, -1):
-        if get_chip(state[i], i + 1) == val:
-            l -= 1
-            if l == 0:
-                count += 1
-    for i in range(6, 2, -1):
-        if get_chip(state[i], i + 1) == val:
-            m -= 1
-            if m == 0:
-                count += 1
-    for i in range(6, 3, -1):
-        if get_chip(state[i], i + 1) == val:
-            n -= 1
-            if n == 0:
-                count += 1
-    for i in range(3, 0, -1):
-        if get_chip(state[i + 1], i) == val:
-            o -= 1
-            if o == 0:
-                count += 1
-    for i in range(3, 0, -1):
-        if get_chip(state[i + 2], i) == val:
-            p -= 1
-            if p == 0:
-                count += 1
-    return count
-
-#
-# def diagonal_count(state, val):
-#     count = 0
-#     for k in range(0, 6 + 7 - 2 + 1):
-#         fourinrow = 4
-#         for j in range(0, k + 1):
-#             i = k - j
-#             if i < 6 and j < 7:
-#                 if get_chip(state[j], i) == val:
-#                     # print(get_chip(state[j],i))
-#                     fourinrow -= 1
-#                     if fourinrow == 0:
-#                         count += 1
-#                 else:
-#                     fourinrow = 4
-#
-#     # for k in range(0,12):
-#     #     fourinrow = 4
-#     #     for i in range(0,k+1):
-#     #         j = 6 + i
-#     #         if i > -1 and j < 7:
-#     #             print(i, j)
-#     #             if get_chip(state[j], i) == val:
-#     #                 #print(get_chip(state[j],i))
-#     #
-#     #                 fourinrow -= 1
-#     #                 if fourinrow == 0:
-#     #                     count += 1
-#     #             else:
-#     #                 fourinrow = 4
-#     #     print('\n')
-#     return count
-
-
 def downtoup_diagonal_count(state, value):
     connected_fours = 0
     for j in range(4):
@@ -230,7 +113,6 @@ def uptodown_diagonal_count(state, value):
             count = 0
             four_in_a_row = True
             while count < 4:
-                print(jd,id)
                 if state[jd][id] != value:
                     four_in_a_row = False
                     break
@@ -241,12 +123,13 @@ def uptodown_diagonal_count(state, value):
                 connected_fours += 1
     return connected_fours
 
+
 def red_score(state):
-    return horizontal_count(state, '1') + vertical_count(state, '1') + uptodown_diagonal_count(state,'1') + downtoup_diagonal_count(state,'1')
+    return horizontal_count(state, '1') + vertical_count(state, '1') + uptodown_diagonal_count(state, '1') + downtoup_diagonal_count(state, '1')
 
 
 def yellow_score(state):
-    return horizontal_count(state, '2') + vertical_count(state, '2') + uptodown_diagonal_count(state,'2') + downtoup_diagonal_count(state,'2')
+    return horizontal_count(state, '2') + vertical_count(state, '2') + uptodown_diagonal_count(state, '2') + downtoup_diagonal_count(state, '2')
 
 
 def evaluate(state):
@@ -399,7 +282,7 @@ def print_board(state):
 state = ['111111', '111111', '111111', '111111', '000000', '000000', '000000']
 (children, indices) = state_children(state, '1')
 print_board(state)
-print(downtoup_diagonal_count(state,'1'))
+print(downtoup_diagonal_count(state, '1'))
 
 # for item in children:
 #     print_board(item)
