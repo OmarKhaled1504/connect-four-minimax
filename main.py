@@ -26,7 +26,10 @@ class Game:
         else:
             return 0
 
-
+class Child:
+    def __init__(self, state, index):
+        self.state = state
+        self.index = index
 #TAKES AN INPUT STATE AND GENERATES ALL POSSIBLE MOVES FROM THIS STATE
 def state_children(state, val):
     children = []
@@ -34,14 +37,15 @@ def state_children(state, val):
     for i in range(0, 7):
         for j in range(0, 6):
             if get_chip(state[i], j) == '0':
-                child = set_chip(state, i, j, val)
+                temp = set_chip(state, i, j, val)
                 index = (i, j)
+                child = Child(temp, index)
                 children.append(child)
-                indices.append(index)
+
                 break
 
 
-    return (children, indices)
+    return (children)
 
 
 def detect_four_vertically(column, val):
@@ -221,7 +225,7 @@ def terminal_test(state):
 # minimax with alpha beta pruning#########################
 def decisionwp(state):
 
-    (child, temp, index) = maximizewp(state, -math.inf, math.inf, 8)
+    (child, temp, index) = maximizewp(state, -math.inf, math.inf, 7)
     return (child, index)
 
 
@@ -232,17 +236,17 @@ def minimizewp(state, alpha, beta, steps_count):
         return (None, evaluate(state),None)
     (minChild, minUtility, index) = (None, 500, None)
     steps_count -= 1
-    (children, indices) = state_children(state, '2')
-    i = 0
-    for child in children:
-        (temp, utility, index) = maximizewp(child, alpha, beta, steps_count)
+
+    for child in state_children(state, '2'):
+        (temp, utility, temp2) = maximizewp(child.state, alpha, beta, steps_count)
         if utility < minUtility:
-            (minChild, minUtility, index) = (child, utility, indices[i])
+            (minChild, minUtility, index) = (child.state, utility, child.index)
         if minUtility <= alpha:
             break
         if minUtility < beta:
             beta = minUtility
-        i += 1
+
+
     return (minChild, minUtility, index)
 
 
@@ -254,17 +258,16 @@ def maximizewp(state, alpha, beta, steps_count):
 
     (maxChild, maxUtility, index) = (None, -500, None)
     steps_count -= 1
-    (children, indices) = state_children(state, '2')
-    i = 0
-    for child in children:
-        (temp, utility, index) = minimizewp(child, alpha, beta, steps_count)
+    for child in state_children(state, '2'):
+        (temp, utility, temp2) = minimizewp(child.state, alpha, beta, steps_count)
         if utility > maxUtility:
-            (maxChild, maxUtility, index) = (child, utility, indices[i])
+            (maxChild, maxUtility, index) = (child.state, utility, child.index)
         if maxUtility >= beta:
             break
         if maxUtility > alpha:
             alpha = maxUtility
-        i += 1
+
+
     return (maxChild, maxUtility, index)
 #########################################################
 
@@ -308,7 +311,6 @@ def decision(state):
 def get_chip(column, j):
     word = split(column)
     return word[j]
-    #return int(column / (10 ** (5 - j)) % 10)
 
 
 def split(word):
@@ -341,48 +343,29 @@ def print_board(state):
 
 
 
-
-
+# game = Game()
+# board = game.start()
+#
 # while not terminal_test(board):
-#     print('ENTER YOUR MOVE\n')
+#     print('\nENTER YOUR MOVE\n')
 #     j = int(input('ROW: '))
 #     i = int(input('\nCOLUMN: '))
 #     board = set_chip(board, i, j, '1')
-#     print("YOUR MOVE\n")
+#     print("YOUR MOVE")
 #     print_board(board)
 #     (board, index) = decisionwp(board)
-#     print("BOTS'S MOVE\n")
+#     print(index)
+#     print("\nBOTS'S MOVE")
 #     print_board(board)
 
 
 
 
 
-state = ['121212', '122222', '120000', '100000', '120000', '100000', '111000']
-(children, indices) = state_children(state, '1')
+# state = ['121212', '122222', '120000', '100000', '120000', '100000', '111000']
+# (children, indices) = state_children(state, '1')
 
-for item in children:
-    print_board(item)
-    print('\n')
-print(indices)
-#
-# print_board(state)
-# print('\n')
-# state = decisionwp(state)
-# print_board(state)
-# print('\n')
-#
-# state = decisionwp(state)
-# print_board(state)
-# print('\n')
-#
-# state = decisionwp(state)
-# print_board(state)
-# print('\n')
-#
-# state = decision(state)
-# print_board(state)
-# print('\n')
+
 
 
 

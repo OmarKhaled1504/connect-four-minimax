@@ -178,13 +178,8 @@ def game():
                         print("PLAYER TURN")
                         main.print_board(state)
                         print('\n')
-                        # if main.red_score(board)>>main.yellow_score(board):
-                        #     label = myfont.render("Player 1 wins!!", 1, RED)
-                        #     screen.blit(label, (40, 10))
-                        #     game_over = True
                         turn += 1
                         turn = turn % 2
-                        #print_board(board)
                         draw_board(board)
                 # # ai Input
         if turn == ai and not game_over:
@@ -200,11 +195,15 @@ def game():
                 j = index[1]
 
                 drop_piece(board, j, i, ai_piece)
-
-                # if main.red_score(board)<<main.yellow_score(board):
-                #     label = myfont.render("Player 2 wins!!", 1, YELLOW)
-                #     screen.blit(label, (40, 10))
-                #     game_over = True
+                if main.terminal_test(state):
+                    if main.red_score(state) <= main.yellow_score(state):
+                        label = myfont.render("AI WINS!!", True, YELLOW)
+                        screen.blit(label, (40, 10))
+                        game_over = True
+                    else:
+                        label = myfont.render("PLAYER WINS!!", True, YELLOW)
+                        screen.blit(label, (40, 10))
+                        game_over = True
 
                 #print_board(board)
                 draw_board(board)
@@ -214,8 +213,9 @@ def game():
                 # BET5ALY EL TURN YA 0 YA 1
                 turn += 1
                 turn = turn % 2
-        if game_over:
-            pygame.time.wait(3000)  # WAITS 3000 MILISECONDS
+       # if game_over:
+            #pygame.time.wait(5000)  # WAITS 3000 MILISECONDS
+            #sys.exit()
 
 
 main_menu()
