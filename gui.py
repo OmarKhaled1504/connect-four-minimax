@@ -50,6 +50,7 @@ def message_display(text):
     pygame.display.update()
 
 
+# function to add buttons
 def button(msg, x, y, w, h, ic, ac, action=None):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
@@ -71,23 +72,15 @@ def text_objects(text, font):
     return textsurface, textsurface.get_rect()
 
 
-# def things_dodged(count):
-#     font = pygame.font.SysFont(None, 25)
-#     text = font.render("Dodged: " + str(count), True, BLACK)
-#     gameDisplay.blit(text, (0, 0))
-
-
-# def crash():
-#     message_display('You Crashed')
-
+def things_dodged(count):
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("Dodged: " + str(count), True, BLACK)
+    gameDisplay.blit(text, (0, 0))
 
 # mixer.music.load("background.wav")
 # mixer.music.play(-1)
 
 # click = False
-
-
-# function to add buttons
 
 
 # ---------------------------------------------------------------#
