@@ -1,17 +1,21 @@
 import random
-from pygame.locals import *
 import numpy as connect4
 import pygame
 import sys
 import math
 import main
-
+import time
 from pygame import mixer
+
 BLUE = (0, 0, 128)  # value for blue # color of board
 BLACK = (0, 0, 0)  # value for black # color of background
 RED = (255, 100, 100)  # value for red   # color of our 2oshat
 YELLOW = (255, 255, 0)  # value for yellow  #color of ai 2oshat
 SHADOW = (192, 192, 192)
+green = (0, 200, 0)
+
+bright_red = (255, 0, 0)
+bright_green = (0, 255, 0)
 
 ROW_COUNT = 6  # number of rows
 COLUMN_COUNT = 7  # number of columns
@@ -23,7 +27,8 @@ ai = 1
 empty = 0
 pl_piece = 1
 ai_piece = 2
-
+display_width = 800
+display_height = 600
 square_length = 4
 
 # Setup pygame/window ---------------------------------------- #
@@ -31,59 +36,84 @@ mainClock = pygame.time.Clock()
 
 pygame.init()
 pygame.display.set_caption('game base')
-screen = pygame.display.set_mode((650, 500), 0, 32)
+gameDisplay = pygame.display.set_mode((display_width, display_height))
 myfont = pygame.font.SysFont("monospace", 75)
 
 
 # FUNCTION TO DRAW ON SCREEN
-def draw_text(text, font, color, surface, x, y):
-    textobj = font.render(text, 1, color)
-    textrect = textobj.get_rect()
-    textrect.topleft = (x, y)
-    surface.blit(textobj, textrect)
+def message_display(text):
+    largeText = pygame.font.Font('freesansbold.ttf', 50)
+    TextSurf, TextRect = text_objects(text, largeText)
+    TextRect.center = ((display_width / 2), (display_height / 2))
+    gameDisplay.blit(TextSurf, TextRect)
+
+    pygame.display.update()
+
+
+def button(msg, x, y, w, h, ic, ac, action=None):
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+
+    if x + w > mouse[0] > x and y + h > mouse[1] > y:
+        pygame.draw.rect(gameDisplay, ac, (x, y, w, h))
+        if click[0] == 1 and action != None:
+            action()
+    else:
+        pygame.draw.rect(gameDisplay, ic, (x, y, w, h))
+    smallText = pygame.font.SysFont("comicsansms", 20)
+    textSurf, textRect = text_objects(msg, smallText)
+    textRect.center = ((x + (w / 2)), (y + (h / 2)))
+    gameDisplay.blit(textSurf, textRect)
+
+
+def text_objects(text, font):
+    textsurface = font.render(text, True, BLACK)
+    return textsurface, textsurface.get_rect()
+
+
+# def things_dodged(count):
+#     font = pygame.font.SysFont(None, 25)
+#     text = font.render("Dodged: " + str(count), True, BLACK)
+#     gameDisplay.blit(text, (0, 0))
+
+
+# def crash():
+#     message_display('You Crashed')
 
 
 # mixer.music.load("background.wav")
 # mixer.music.play(-1)
 
-click = False
+# click = False
+
+
+# function to add buttons
 
 
 # ---------------------------------------------------------------#
 
 
-def main_menu():
-    while True:
-        pygame.display.set_caption('CONNECT 4 ')
-        screen.fill(BLACK)
-        draw_text('CONNECT FOUR', myfont, RED, screen, 40, 25)
+def game_intro():
+    intro = True
 
-        mx, my = pygame.mouse.get_pos()
-
-        button_1 = pygame.Rect(225, 400, 200, 50)
-
-        text = myfont.render('quit', True, BLACK)
-        if button_1.collidepoint((mx, my)):
-            if click:
-                game()
-
-        pygame.draw.rect(screen, SHADOW, button_1)
-
-        click = False
+    while intro:
         for event in pygame.event.get():
-            if event.type == QUIT:
+            # print(event)
+            if event.type == pygame.QUIT:
                 pygame.quit()
-                sys.exit()
-            if event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    pygame.quit()
-                    sys.exit()
-            if event.type == MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    click = True
+                quit()
+
+        gameDisplay.fill(SHADOW)
+        largeText = pygame.font.SysFont("comicsansms", 115)
+        TextSurf, TextRect = text_objects("CONNECT 4", largeText)
+        TextRect.center = ((display_width / 2), (display_height / 2))
+        gameDisplay.blit(TextSurf, TextRect)
+
+        button("START", 150, 450, 100, 50, green, bright_green, game)
+        # SHEEL GAME WE HOT BEL MINIMAX
+        button("MINIMAX", 550, 450, 100, 50, RED, bright_red, game)
 
         pygame.display.update()
-        mainClock.tick(60)
 
 
 def game():
@@ -103,7 +133,8 @@ def game():
                 return r
 
     def print_board(board):
-        print(connect4.flip(board, 0))
+        print(connect4.flip(board, 0))  # board after flipping
+        print(board)  # orignal board
 
     def draw_board(board):
         for c in range(COLUMN_COUNT):  # drawing the rectangle of the board
@@ -144,7 +175,7 @@ def game():
     draw_board(board)
     pygame.display.update()
 
-    #turn = random.randint(player, ai)  # makes a random start of player or ai
+    # turn = random.randint(player, ai)  # makes a random start of player or ai
     turn = 0
     game = main.Game()
     state = game.start()
@@ -178,8 +209,13 @@ def game():
                         print("PLAYER TURN")
                         main.print_board(state)
                         print('\n')
+                        # if main.red_score(board)>>main.yellow_score(board):
+                        #     label = myfont.render("Player 1 wins!!", 1, RED)
+                        #     screen.blit(label, (40, 10))
+                        #     game_over = True
                         turn += 1
                         turn = turn % 2
+                        # print_board(board)
                         draw_board(board)
                 # # ai Input
         if turn == ai and not game_over:
@@ -195,17 +231,13 @@ def game():
                 j = index[1]
 
                 drop_piece(board, j, i, ai_piece)
-                if main.terminal_test(state):
-                    if main.red_score(state) <= main.yellow_score(state):
-                        label = myfont.render("AI WINS!!", True, YELLOW)
-                        screen.blit(label, (40, 10))
-                        game_over = True
-                    else:
-                        label = myfont.render("PLAYER WINS!!", True, YELLOW)
-                        screen.blit(label, (40, 10))
-                        game_over = True
 
-                #print_board(board)
+                # if main.red_score(board)<<main.yellow_score(board):
+                #     label = myfont.render("Player 2 wins!!", 1, YELLOW)
+                #     screen.blit(label, (40, 10))
+                #     game_over = True
+
+                # print_board(board)
                 draw_board(board)
                 print("AI TURN")
                 main.print_board(state)
@@ -214,8 +246,7 @@ def game():
                 turn += 1
                 turn = turn % 2
         if game_over:
-            pygame.time.wait(5000)  # WAITS 3000 MILISECONDS
-            sys.exit()
+            pygame.time.wait(3000)  # WAITS 3000 MILISECONDS to announce winner
 
 
-main_menu()
+game_intro()

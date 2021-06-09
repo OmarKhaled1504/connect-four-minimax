@@ -1,3 +1,160 @@
+import pygame
+import time
+import random
+
+pygame.init()
+
+display_width = 800
+display_height = 600
+
+black = (0, 0, 0)
+white = (255, 255, 255)
+red = (255, 0, 0)
+
+block_color = (53, 115, 255)
+
+car_width = 73
+
+gameDisplay = pygame.display.set_mode((display_width, display_height))
+pygame.display.set_caption('A bit Racey')
+clock = pygame.time.Clock()
+
+
+
+
+def things_dodged(count):
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("Dodged: " + str(count), True, black)
+    gameDisplay.blit(text, (0, 0))
+
+def text_objects(text, font):
+    textSurface = font.render(text, True, black)
+    return textSurface, textSurface.get_rect()
+
+
+def message_display(text):
+    largeText = pygame.font.Font('freesansbold.ttf', 115)
+    TextSurf, TextRect = text_objects(text, largeText)
+    TextRect.center = ((display_width / 2), (display_height / 2))
+    gameDisplay.blit(TextSurf, TextRect)
+
+    pygame.display.update()
+
+    time.sleep(2)
+
+    game_loop()
+
+
+def crash():
+    message_display('You Crashed')
+
+
+def game_intro():
+    intro = True
+
+    while intro:
+        for event in pygame.event.get():
+            # print(event)
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+        gameDisplay.fill(white)
+        largeText = pygame.font.Font('freesansbold.ttf', 115)
+        TextSurf, TextRect = text_objects("A bit Racey", largeText)
+        TextRect.center = ((display_width / 2), (display_height / 2))
+        gameDisplay.blit(TextSurf, TextRect)
+
+        mouse = pygame.mouse.get_pos()
+
+        # print(mouse)
+
+        if 150 + 100 > mouse[0] > 150 and 450 + 50 > mouse[1] > 450:
+            pygame.draw.rect(gameDisplay, red, (150, 450, 100, 50))
+        else:
+            pygame.draw.rect(gameDisplay, red, (150, 450, 100, 50))
+
+        smallText = pygame.font.Font("freesansbold.ttf", 20)
+        textSurf, textRect = text_objects("GO!", smallText)
+        textRect.center = ((150 + (100 / 2)), (450 + (50 / 2)))
+        gameDisplay.blit(textSurf, textRect)
+
+        pygame.draw.rect(gameDisplay, red, (550, 450, 100, 50))
+
+        pygame.display.update()
+        clock.tick(15)
+def game_loop():
+    x = (display_width * 0.45)
+    y = (display_height * 0.8)
+
+    x_change = 0
+
+    thing_startx = random.randrange(0, display_width)
+    thing_starty = -600
+    thing_speed = 4
+    thing_width = 100
+    thing_height = 100
+
+    thingCount = 1
+
+    dodged = 0
+
+    gameExit = False
+
+    while not gameExit:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    x_change = -5
+                if event.key == pygame.K_RIGHT:
+                    x_change = 5
+
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                    x_change = 0
+
+        x += x_change
+        gameDisplay.fill(white)
+
+        things(thing_startx, thing_starty, thing_width, thing_height, block_color)
+
+        thing_starty += thing_speed
+        car(x, y)
+        things_dodged(dodged)
+
+        if x > display_width - car_width or x < 0:
+            crash()
+
+        if thing_starty > display_height:
+            thing_starty = 0 - thing_height
+            thing_startx = random.randrange(0, display_width)
+            dodged += 1
+            thing_speed += 1
+            thing_width += (dodged * 1.2)
+
+        if y < thing_starty + thing_height:
+            print('y crossover')
+
+            if x > thing_startx and x < thing_startx + thing_width or x + car_width > thing_startx and x + car_width < thing_startx + thing_width:
+                print('x crossover')
+                crash()
+
+        pygame.display.update()
+        clock.tick(60)
+
+
+game_intro()
+game_loop()
+pygame.quit()
+quit()
+
+
+
 # import pygame
 # from pygame.locals import *
 #
@@ -75,25 +232,16 @@
 #
 # again = button(75, 200, 'Play Again?')
 # quit = button(325, 200, 'Quit?')
-# down = button(75, 350, 'Down')
-# up = button(325, 350, 'Up')
-#
 # run = True
 # while run:
 #
 #     screen.fill(bg)
-#
 #     if again.draw_button():
-#         print('Again')
 #         counter = 0
 #     if quit.draw_button():
 #         print('Quit')
-#     if up.draw_button():
-#         print('Up')
-#         counter += 1
-#     if down.draw_button():
-#         print('Down')
-#         counter -= 1
+#
+#
 #
 #     counter_img = font.render(str(counter), True, red)
 #     screen.blit(counter_img, (280, 450))
@@ -105,150 +253,3 @@
 #     pygame.display.update()
 #
 # pygame.quit()
-# # import random
-# #
-# # import numpy as connect4
-# # import pygame
-# # import sys
-# # import math
-# #
-# # BLUE = (0, 0, 128)  # value for blue # color of board
-# # BLACK = (0, 0, 0)  # value for black # color of background
-# # RED = (255, 100, 100)  # value for red   # color of our 2oshat
-# # YELLOW = (255, 255, 0)  # value for yellow  #color of ai 2oshat
-# # SHADOW = (192, 192, 192)
-# #
-# # ROW_COUNT = 6  # number of rows
-# # COLUMN_COUNT = 7  # number of columns
-# # square_size = 100  # size of square
-# #
-# # player = 0
-# # ai = 1
-# #
-# # empty = 0
-# # pl_piece = 1
-# # ai_piece = 2
-# #
-# # square_length = 4
-# #
-# #
-# # def screen2():
-# #     def create_board():
-# #         board = connect4.zeros((ROW_COUNT, COLUMN_COUNT))  # matrix of zeros 6 x 7
-# #         return board
-# #
-# #     def drop_piece(board, row, col, piece):
-# #         board[row][col] = piece
-# #
-# #     def is_valid_location(board, col):
-# #         return board[ROW_COUNT - 1][col] == 0
-# #
-# #     def get_next_open_row(board, col):
-# #         for r in range(ROW_COUNT):
-# #             if board[r][col] == 0:
-# #                 return r
-# #
-# #     def print_board(board):
-# #         print(connect4.flip(board, 0))
-# #
-# #     def draw_board(board):
-# #         for c in range(COLUMN_COUNT):  # drawing the rectangle of the board
-# #             for r in range(ROW_COUNT):
-# #                 pygame.draw.rect(screen, BLUE,
-# #                                  (c * square_size, r * square_size + square_size, square_size, square_size))
-# #                 pygame.draw.circle(screen, SHADOW, (
-# #                     int(c * square_size + square_size / 2), int(r * square_size + square_size + square_size / 2)),
-# #                                    RADIUS)  # drawing the circles inside rectangle of the board
-# #
-# #         for c in range(COLUMN_COUNT):  # adds in the matrix updates list
-# #             for r in range(ROW_COUNT):
-# #                 if board[r][c] == pl_piece:
-# #                     pygame.draw.circle(screen, RED, (
-# #                         int(c * square_size + square_size / 2), height - int(r * square_size + square_size / 2)),
-# #                                        RADIUS)
-# #                 elif board[r][c] == ai_piece:
-# #                     pygame.draw.circle(screen, YELLOW, (
-# #                         int(c * square_size + square_size / 2), height - int(r * square_size + square_size / 2)),
-# #                                        RADIUS)
-# #         pygame.display.update()
-# #
-# #     def get_valid_locations(board):
-# #         valid_locations = []
-# #         for col in range(COLUMN_COUNT):
-# #             if is_valid_location(board, col):
-# #                 valid_locations.append(col)
-# #         return valid_locations
-# #
-# #     board = create_board()
-# #     game_over = False
-# #     pygame.init()
-# #     width = COLUMN_COUNT * square_size
-# #     height = (ROW_COUNT + 1) * square_size
-# #
-# #     size = (width, height)
-# #     RADIUS = int(square_size / 2 - 5)
-# #     screen = pygame.display.set_mode(size)
-# #     draw_board(board)
-# #     pygame.display.update()
-# #
-# #     myfont = pygame.font.SysFont("monospace", 75)
-# #
-# #     turn = random.randint(player, ai)  # makes a random start of player or ai
-# #     while not game_over:
-# #
-# #         for event in pygame.event.get():
-# #             if event.type == pygame.QUIT:
-# #                 sys.exit()
-# #
-# #             if event.type == pygame.MOUSEMOTION:
-# #                 pygame.draw.rect(screen, BLACK, (0, 0, width, square_size))  # BETRG3HA BLACK
-# #                 posx = event.pos[0]
-# #                 if turn == player:
-# #                     pygame.draw.circle(screen, RED, (posx, int(square_size / 2)), RADIUS)
-# #             pygame.display.update()
-# #
-# #             if event.type == pygame.MOUSEBUTTONDOWN:
-# #                 pygame.draw.rect(screen, BLACK, (0, 0, width, square_size))
-# #                 # print(event.pos)
-# #                 # Ask for Player 1 Input
-# #                 if turn == player:
-# #                     posx = event.pos[0]
-# #                     col = int(math.floor(posx / square_size))
-# #
-# #                     if is_valid_location(board, col):
-# #                         row = get_next_open_row(board, col)
-# #                         drop_piece(board, row, col, pl_piece)
-# #
-# #                         # if main.red_score(board)>>main.yellow_score(board):
-# #                         #     label = myfont.render("Player 1 wins!!", 1, RED)
-# #                         #     screen.blit(label, (40, 10))
-# #                         #     game_over = True
-# #                         turn += 1
-# #                         turn = turn % 2
-# #                         print_board(board)
-# #                         draw_board(board)
-# #                 # # ai Input
-# #         if turn == ai and not game_over:
-# #
-# #             col = random.randint(0, COLUMN_COUNT - 1)
-# #             # hot hena el functions ely hatnady 3aleha
-# #             if is_valid_location(board, col):
-# #                 pygame.time.wait(300)
-# #                 row = get_next_open_row(board, col)
-# #                 drop_piece(board, row, col, ai_piece)
-# #
-# #                 # if main.red_score(board)<<main.yellow_score(board):
-# #                 #     label = myfont.render("Player 2 wins!!", 1, YELLOW)
-# #                 #     screen.blit(label, (40, 10))
-# #                 #     game_over = True
-# #
-# #                 print_board(board)
-# #                 draw_board(board)
-# #                 # BET5ALY EL TURN YA 0 YA 1
-# #                 turn += 1
-# #                 turn = turn % 2
-# #         if game_over:
-# #             pygame.time.wait(3000)  # WAITS 3000 MILISECONDS
-# #
-# #
-# # screen2()
