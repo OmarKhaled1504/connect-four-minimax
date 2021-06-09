@@ -30,7 +30,7 @@ ai_piece = 2
 display_width = 800
 display_height = 600
 square_length = 4
-
+pr = 0
 # Setup pygame/window ---------------------------------------- #
 mainClock = pygame.time.Clock()
 
@@ -58,6 +58,9 @@ def button(msg, x, y, w, h, ic, ac, action=None):
     if x + w > mouse[0] > x and y + h > mouse[1] > y:
         pygame.draw.rect(gameDisplay, ac, (x, y, w, h))
         if click[0] == 1 and action != None:
+            if msg == "PRUNING":
+                pr = 1
+                print(pr)
             action()
     else:
         pygame.draw.rect(gameDisplay, ic, (x, y, w, h))
@@ -76,6 +79,7 @@ def things_dodged(count):
     font = pygame.font.SysFont(None, 25)
     text = font.render("Dodged: " + str(count), True, BLACK)
     gameDisplay.blit(text, (0, 0))
+
 
 # mixer.music.load("background.wav")
 # mixer.music.play(-1)
@@ -104,7 +108,7 @@ def game_intro():
 
         button("START", 150, 450, 100, 50, green, bright_green, game)
         # SHEEL GAME WE HOT BEL MINIMAX
-        button("MINIMAX", 550, 450, 100, 50, RED, bright_red, game)
+        button("PRUNING", 550, 450, 100, 80, RED, bright_red, game)
 
         pygame.display.update()
 
@@ -167,7 +171,7 @@ def game():
     draw_board(board)
     pygame.display.update()
 
-    #turn = random.randint(player, ai)  # makes a random start of player or ai
+    # turn = random.randint(player, ai)  # makes a random start of player or ai
     turn = 0
     game = main.Game()
     state = game.start()
@@ -212,13 +216,19 @@ def game():
             if is_valid_location(board, col):
                 pygame.time.wait(100)
                 row = get_next_open_row(board, col)
-#*****************************************************************
-                (state, index) = main.decisionwp(state)
-                print(index)
-                i = index[0]
-                j = index[1]
-                drop_piece(board, j, i, ai_piece)
-#*****************************************************************
+                if pr:
+                    (state, index) = main.decisionwp(state)
+                    print(index)
+                    i = index[0]
+                    j = index[1]
+                    drop_piece(board, j, i, ai_piece)
+                else:
+                    (state, index) = main.decision(state)
+                    print(index)
+                    i = index[0]
+                    j = index[1]
+                    drop_piece(board, j, i, ai_piece)
+                # *****************************************************************
                 if main.terminal_test(state):
                     if main.red_score(state) <= main.yellow_score(state):
                         label = myfont.render("AI WINS!!", True, YELLOW)
@@ -229,7 +239,7 @@ def game():
                         screen.blit(label, (40, 10))
                         game_over = True
 
-                #print_board(board)
+                # print_board(board)
                 draw_board(board)
                 print("AI TURN")
                 main.print_board(state)
