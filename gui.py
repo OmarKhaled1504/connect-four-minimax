@@ -52,6 +52,7 @@ def message_display(text):
 
 # function to add buttons
 def button(msg, x, y, w, h, ic, ac, action=None):
+    global pr
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
