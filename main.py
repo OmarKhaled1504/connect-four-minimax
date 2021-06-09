@@ -58,12 +58,27 @@ def detect_four_vertically(column, val):
                 return 1
         else:
             k = 4
+def detect_3_vertically(column, val):
+    k = 3
+    for j in range(0, 6):
+        if get_chip(column, j) == val:
+            k -= 1
+            if k == 0 and j<=4 and get_chip(column, j+1) == '0':
+                return 1
+        else:
+            k = 3
 
-
-def vertical_count(state, val):
+def vertical_4_count(state, val):
     count = 0
     for column in state:
         if detect_four_vertically(column, val):
+            count += 1
+    return count
+
+def vertical_3_count(state, val):
+    count = 0
+    for column in state:
+        if detect_3_vertically(column, val):
             count += 1
     return count
 
@@ -77,13 +92,38 @@ def detect_four_horizontally(state, row, val):
                 return 1
         else:
             k = 4
+def detect_three_horizontally(state, row, val):
+    k = 3
+    for i in range(0, 7):
+        if get_chip(state[i], row) == val:
+            k -= 1
+            if k == 0 and i <= 5 and state[i+1][row] == '0' and i >= 3 and state[i-3][row] == '0':
+                return 2
+            elif k == 0 and i <=5 and state[i+1][row] == '0':
+
+                return 1
+            elif k == 0 and i >= 3 and state[i-3][row] == '0':
+                return 1
+
+        else:
+            k = 3
 
 
-def horizontal_count(state, val):
+
+def horizontal_4_count(state, val):
     count = 0
     for j in range(0, 6):
         if detect_four_horizontally(state, j, val):
             count += 1
+    return count
+
+def horizontal_3_count(state, val):
+    count = 0
+    for j in range(0, 6):
+        if detect_three_horizontally(state, j, val) == 1:
+            count += 1
+        elif detect_three_horizontally(state, j, val) == 2:
+            count += 2
     return count
 
 
@@ -126,17 +166,29 @@ def uptodown_diagonal_count(state, value):
                 connected_fours += 1
     return connected_fours
 
+def red_3_score(state):
+    return horizontal_3_count(state, '1') + vertical_3_count(state, '1')
+
+
+def yellow_3_score(state):
+    return horizontal_3_count(state, '2') + vertical_3_count(state, '2')
 
 def red_score(state):
-    return horizontal_count(state, '1') + vertical_count(state, '1') + uptodown_diagonal_count(state, '1') + downtoup_diagonal_count(state, '1')
+    return horizontal_4_count(state, '1') + vertical_4_count(state, '1') + uptodown_diagonal_count(state, '1') + downtoup_diagonal_count(state, '1')
 
 
 def yellow_score(state):
-    return horizontal_count(state, '2') + vertical_count(state, '2') + uptodown_diagonal_count(state, '2') + downtoup_diagonal_count(state, '2')
+    return horizontal_4_count(state, '2') + vertical_4_count(state, '2') + uptodown_diagonal_count(state, '2') + downtoup_diagonal_count(state, '2')
 
 
 def evaluate(state):
-    return red_score(state) - yellow_score(state)
+    x = yellow_score(state)*20
+    y = red_score(state)*-20
+    z = red_3_score(state)*-8
+    a = yellow_3_score(state)*8
+
+
+    return x + y + z + a
 
 
 def terminal_test(state):
@@ -147,7 +199,7 @@ def terminal_test(state):
     return 1
 
 
-# ********************************** MINIMAX WITH ALPHA BETA PRUNING *****************************************************
+# ********************************** MINIMAX WITH ALPHA BETA PRUNING ***************************************************
 
 
 def decisionwp(state):
@@ -270,26 +322,9 @@ def print_board(state):
               get_chip(state[4], j), '', get_chip(state[5], j), '', get_chip(state[6], j))
 
 
+state = ['0111000','110000','111000','101110','000000','000000','000000']
+print_board(state)
+print(detect_three_horizontally(state, 1, '1'))
+print(horizontal_3_count(state,'1'))
 
 
-# game = Game()
-# board = game.start()
-#
-# while not terminal_test(board):
-#     print('\nENTER YOUR MOVE\n')
-#     j = int(input('ROW: '))
-#     i = int(input('\nCOLUMN: '))
-#     board = set_chip(board, i, j, '1')
-#     print("YOUR MOVE")
-#     print_board(board)
-#     (board, index) = decisionwp(board)
-#     print(index)
-#     print("\nBOTS'S MOVE")
-#     print_board(board)
-
-
-
-
-
-# state = ['121212', '122222', '120000', '100000', '120000', '100000', '111000']
-# (children, indices) = state_children(state, '1')
