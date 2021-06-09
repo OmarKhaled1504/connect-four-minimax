@@ -65,6 +65,8 @@ def detect_3_vertically(column, val):
             k -= 1
             if k == 0 and j<=4 and get_chip(column, j+1) == '0':
                 return 1
+            elif k == 1 and j<=4 and get_chip(column, j+1) == '0':
+                return 2
         else:
             k = 3
 
@@ -76,11 +78,16 @@ def vertical_4_count(state, val):
     return count
 
 def vertical_3_count(state, val):
-    count = 0
+    count3 = 0
+    count2 = 0
     for column in state:
-        if detect_3_vertically(column, val):
-            count += 1
-    return count
+        x = detect_3_vertically(column,val)
+        if x == 1:
+            count3 += 1
+        elif x ==2:
+            count2 +=1
+
+    return (count2, count3)
 
 
 def detect_four_horizontally(state, row, val):
@@ -167,11 +174,22 @@ def uptodown_diagonal_count(state, value):
     return connected_fours
 
 def red_3_score(state):
-    return horizontal_3_count(state, '1') + vertical_3_count(state, '1')
+    (x, y) = vertical_3_count(state, '1')
+    return horizontal_3_count(state, '1') + y
 
 
 def yellow_3_score(state):
-    return horizontal_3_count(state, '2') + vertical_3_count(state, '2')
+    (x, y) = vertical_3_count(state, '2')
+    return horizontal_3_count(state, '2') + y
+
+def red_2_score(state):
+    (x, y) = vertical_3_count(state, '1')
+    return x
+
+
+def yellow_2_score(state):
+    (x, y) = vertical_3_count(state, '2')
+    return x
 
 def red_score(state):
     return horizontal_4_count(state, '1') + vertical_4_count(state, '1') + uptodown_diagonal_count(state, '1') + downtoup_diagonal_count(state, '1')
@@ -186,9 +204,11 @@ def evaluate(state):
     y = red_score(state)*-20
     z = red_3_score(state)*-8
     a = yellow_3_score(state)*8
+    d = red_2_score(state)*-5
+    c = yellow_2_score(state)*5
 
 
-    return x + y + z + a
+    return x + y + z + a + d + c
 
 
 def terminal_test(state):
