@@ -221,7 +221,7 @@ def terminal_test(state):
 
 # ********************************** MINIMAX WITH ALPHA BETA PRUNING ***************************************************
 
-
+minimax_tree = []
 def decisionwp(state):
 
     (child, temp, index) = maximizewp(state, -math.inf, math.inf, 6)
@@ -232,11 +232,13 @@ def minimizewp(state, alpha, beta, steps_count):
     if terminal_test(state):
         return (None, evaluate(state),None)
     if steps_count == 0:
-        return (None, evaluate(state),None)
+        value = evaluate(state)
+        minimax_tree.append(value)
+        return (None, value,None)
     (minChild, minUtility, index) = (None, 500, None)
     steps_count -= 1
 
-    for child in state_children(state, '2'):
+    for child in state_children(state, '1'):
         (temp, utility, temp2) = maximizewp(child.state, alpha, beta, steps_count)
         if utility < minUtility:
             (minChild, minUtility, index) = (child.state, utility, child.index)
@@ -253,7 +255,9 @@ def maximizewp(state, alpha, beta, steps_count):
     if terminal_test(state):
         return (None, evaluate(state), None)
     if steps_count == 0:
-        return (None, evaluate(state), None)
+        value = evaluate(state)
+        minimax_tree.append(value)
+        return (None, value, None)
 
     (maxChild, maxUtility, index) = (None, -500, None)
     steps_count -= 1
@@ -342,9 +346,12 @@ def print_board(state):
               get_chip(state[4], j), '', get_chip(state[5], j), '', get_chip(state[6], j))
 
 
-state = ['0111000','110000','111000','101110','000000','000000','000000']
-print_board(state)
-print(detect_three_horizontally(state, 1, '1'))
-print(horizontal_3_count(state,'1'))
-
-
+# game = Game()
+# board = game.start()
+# print_board(board)
+# (board , index) = decisionwp(board)
+# print_board(board)
+# (board , index) = decisionwp(board)
+# print_board(board)
+# (board , index) = decisionwp(board)
+# print_board(board)

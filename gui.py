@@ -61,7 +61,7 @@ def button(msg, x, y, w, h, ic, ac, action=None):
         if click[0] == 1 and action != None:
             if msg == "PRUNING":
                 pr = 1
-                print(pr)
+
             action()
     else:
         pygame.draw.rect(gameDisplay, ic, (x, y, w, h))
@@ -130,9 +130,6 @@ def game():
             if board[r][col] == 0:
                 return r
 
-    def print_board(board):
-        print(connect4.flip(board, 0))
-
     def draw_board(board):
         for c in range(COLUMN_COUNT):  # drawing the rectangle of the board
             for r in range(ROW_COUNT):
@@ -154,13 +151,6 @@ def game():
                                        RADIUS)
         pygame.display.update()
 
-    def get_valid_locations(board):
-        valid_locations = []
-        for col in range(COLUMN_COUNT):
-            if is_valid_location(board, col):
-                valid_locations.append(col)
-        return valid_locations
-
     board = create_board()
     game_over = False
     width = COLUMN_COUNT * square_size
@@ -174,11 +164,14 @@ def game():
 
     # turn = random.randint(player, ai)  # makes a random start of player or ai
     turn = 0
+    #**************************************************
     game = main.Game()
     state = game.start()
     main.print_board(state)
+    #***************************************************
 
     while not game_over:
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -217,18 +210,18 @@ def game():
             if is_valid_location(board, col):
                 pygame.time.wait(100)
                 row = get_next_open_row(board, col)
+                print(pr)
                 if pr:
                     (state, index) = main.decisionwp(state)
-                    print(index)
                     i = index[0]
                     j = index[1]
                     drop_piece(board, j, i, ai_piece)
-                else:
-                    (state, index) = main.decision(state)
-                    print(index)
-                    i = index[0]
-                    j = index[1]
-                    drop_piece(board, j, i, ai_piece)
+                # else:
+                #     (state, index) = main.decision(state)
+                #     print(index)
+                #     i = index[0]
+                #     j = index[1]
+                #     drop_piece(board, j, i, ai_piece)
                 # *****************************************************************
                 if main.terminal_test(state):
                     if main.red_score(state) <= main.yellow_score(state):
@@ -245,6 +238,8 @@ def game():
                 print("AI TURN")
                 main.print_board(state)
                 print('\n')
+                #print(main.minimax_tree,'\n')
+                print('PLAYER SCORE= ',main.red_score(state),'   ','AI SCORE= ',main.yellow_score(state),'\n')
                 # BET5ALY EL TURN YA 0 YA 1
                 turn += 1
                 turn = turn % 2
