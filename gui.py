@@ -114,7 +114,8 @@ def game_intro():
 
 
 def game():
-    global minimax_depth
+    global minimax_depth, runtime
+
     def create_board():
         board = connect4.zeros((ROW_COUNT, COLUMN_COUNT))  # matrix of zeros 6 x 7
         return board
@@ -221,7 +222,9 @@ def game():
                     #main.space_tracker[(i, j)] = 1
                     drop_piece(board, j, i, ai_piece)
                 else:
+                    start_time = time.time()
                     (state, index) = main.decision(state, minimax_depth)
+                    runtime = (time.time() - start_time)
                     i = index[0]
                     j = index[1]
                     #main.space_tracker[(i, j)] = 1
@@ -243,7 +246,7 @@ def game():
                 main.print_board(state)
                 print('\n')
                 print('NODES EXPANDED BY MINIMAX', main.nodes_expanded)
-                print('RUNTIME: ',runtime)
+                print('RUNTIME: ', runtime)
                 print('PLAYER SCORE= ',main.red_score(state),'   ','AI SCORE= ',main.yellow_score(state),'\n')
                 # BET5ALY EL TURN YA 0 YA 1
                 turn += 1
