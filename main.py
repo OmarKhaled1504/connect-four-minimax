@@ -4,6 +4,13 @@
 # j is row
 # i is column
 import math
+nodes_expanded = 0
+space_tracker = {}
+def initialize_dict(dict):
+    for i in range(0, 7):
+        for j in range(0, 6):
+            dict.update({(i, j): 0})
+    return dict
 class Game:
     def __init__(self):
         self.red_score = 0
@@ -222,23 +229,25 @@ def terminal_test(state):
 # ********************************** MINIMAX WITH ALPHA BETA PRUNING ***************************************************
 
 minimax_tree = []
-def decisionwp(state):
-
-    (child, temp, index) = maximizewp(state, -math.inf, math.inf, 6)
+def decisionwp(state, depth):
+    global nodes_expanded
+    nodes_expanded = 0
+    (child, temp, index) = maximizewp(state, -math.inf, math.inf, depth)
     return (child, index)
 
 
 def minimizewp(state, alpha, beta, steps_count):
+    global nodes_expanded
     if terminal_test(state):
         return (None, evaluate(state),None)
     if steps_count == 0:
         value = evaluate(state)
-        minimax_tree.append(value)
         return (None, value,None)
     (minChild, minUtility, index) = (None, 500, None)
     steps_count -= 1
 
     for child in state_children(state, '1'):
+        nodes_expanded += 1
         (temp, utility, temp2) = maximizewp(child.state, alpha, beta, steps_count)
         if utility < minUtility:
             (minChild, minUtility, index) = (child.state, utility, child.index)
@@ -252,16 +261,17 @@ def minimizewp(state, alpha, beta, steps_count):
 
 
 def maximizewp(state, alpha, beta, steps_count):
+    global nodes_expanded
     if terminal_test(state):
         return (None, evaluate(state), None)
     if steps_count == 0:
         value = evaluate(state)
-        minimax_tree.append(value)
         return (None, value, None)
 
     (maxChild, maxUtility, index) = (None, -500, None)
     steps_count -= 1
     for child in state_children(state, '2'):
+        nodes_expanded += 1
         (temp, utility, temp2) = minimizewp(child.state, alpha, beta, steps_count)
         if utility > maxUtility:
             (maxChild, maxUtility, index) = (child.state, utility, child.index)
@@ -277,15 +287,18 @@ def maximizewp(state, alpha, beta, steps_count):
 #*************************************** MINIMAX *******************************************************
 
 def maximize(state, steps_count):
+    global nodes_expanded
     if terminal_test(state):
         return (None, evaluate(state), None)
     if steps_count == 0:
-        return (None, evaluate(state), None)
+        value = evaluate(state)
+        return (None, value, None)
 
     (maxChild, maxUtility, index) = (None, -500, None)
     steps_count -= 1
     for child in state_children(state, '2'):
-        (temp, utility, temp2) = minimize(child.state,steps_count)
+        nodes_expanded += 1
+        (temp, utility, temp2) = minimize(child.state, steps_count)
         if utility > maxUtility:
             (maxChild, maxUtility, index) = (child.state, utility, child.index)
 
@@ -293,23 +306,27 @@ def maximize(state, steps_count):
 
 
 def minimize(state,steps_count):
+    global nodes_expanded
     if terminal_test(state):
         return (None, evaluate(state), None)
     if steps_count == 0:
-        return (None, evaluate(state), None)
+        value = evaluate(state)
+        return (None, value, None)
 
     (minChild, minUtility, index) = (None, 500, None)
     steps_count -= 1
     for child in state_children(state, '1'):
+        nodes_expanded += 1
         (temp, utility, temp2) = maximize(child.state, steps_count)
         if utility < minUtility:
             (minChild, minUtility, index) = (child.state, utility, child.index)
-
     return (minChild, minUtility, index)
 
 
-def decision(state):
-    (child, temp, index) = maximize(state, 5)
+def decision(state, depth):
+    global nodes_expanded
+    nodes_expanded = 0
+    (child, temp, index) = maximize(state, depth)
     return (child, index)
 
 
@@ -337,6 +354,7 @@ def set_chip(state, i, j, val):
     x = split(new_state[i])
     x[j] = str(val)
     new_state[i] = listToString(x)
+
     return new_state
 
 
@@ -345,6 +363,7 @@ def print_board(state):
         print(get_chip(state[0], j), '', get_chip(state[1], j), '', get_chip(state[2], j), '', get_chip(state[3], j), '',
               get_chip(state[4], j), '', get_chip(state[5], j), '', get_chip(state[6], j))
 
+#space_tracker = initialize_dict(space_tracker)
 
 # game = Game()
 # board = game.start()

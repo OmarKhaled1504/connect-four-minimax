@@ -23,7 +23,6 @@ square_size = 100  # size of square
 
 player = 0
 ai = 1
-
 empty = 0
 pl_piece = 1
 ai_piece = 2
@@ -115,6 +114,7 @@ def game_intro():
 
 
 def game():
+    global minimax_depth
     def create_board():
         board = connect4.zeros((ROW_COUNT, COLUMN_COUNT))  # matrix of zeros 6 x 7
         return board
@@ -196,6 +196,7 @@ def game():
                         row = get_next_open_row(board, col)
                         drop_piece(board, row, col, pl_piece)
                         state = main.set_chip(state, col, row, '1')
+                        #main.space_tracker[(col, row)] = 1
                         print("PLAYER TURN")
                         main.print_board(state)
                         print('\n')
@@ -210,18 +211,21 @@ def game():
             if is_valid_location(board, col):
                 pygame.time.wait(100)
                 row = get_next_open_row(board, col)
-                print(pr)
                 if pr:
-                    (state, index) = main.decisionwp(state)
+                    start_time = time.time()
+                    (state, index) = main.decisionwp(state, minimax_depth)
+                    t2 = time.localtime()
+                    runtime = (time.time() - start_time)
                     i = index[0]
                     j = index[1]
+                    #main.space_tracker[(i, j)] = 1
                     drop_piece(board, j, i, ai_piece)
-                # else:
-                #     (state, index) = main.decision(state)
-                #     print(index)
-                #     i = index[0]
-                #     j = index[1]
-                #     drop_piece(board, j, i, ai_piece)
+                else:
+                    (state, index) = main.decision(state, minimax_depth)
+                    i = index[0]
+                    j = index[1]
+                    #main.space_tracker[(i, j)] = 1
+                    drop_piece(board, j, i, ai_piece)
                 # *****************************************************************
                 if main.terminal_test(state):
                     if main.red_score(state) <= main.yellow_score(state):
@@ -238,7 +242,8 @@ def game():
                 print("AI TURN")
                 main.print_board(state)
                 print('\n')
-                #print(main.minimax_tree,'\n')
+                print('NODES EXPANDED BY MINIMAX', main.nodes_expanded)
+                print('RUNTIME: ',runtime)
                 print('PLAYER SCORE= ',main.red_score(state),'   ','AI SCORE= ',main.yellow_score(state),'\n')
                 # BET5ALY EL TURN YA 0 YA 1
                 turn += 1
@@ -247,5 +252,5 @@ def game():
             pygame.time.wait(5000)  # WAITS 3000 MILISECONDS
             sys.exit()
 
-
+minimax_depth = int(input('Enter Depth of minimax tree: '))
 game_intro()
