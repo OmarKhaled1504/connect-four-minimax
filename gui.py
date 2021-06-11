@@ -7,7 +7,7 @@ import main
 import time
 from pygame import mixer
 
-BLUE = (0, 0, 128)  # value for blue # color of board
+BLUE = (0, 0, 90)  # value for blue # color of board
 BLACK = (0, 0, 0)  # value for black # color of background
 RED = (255, 100, 100)  # value for red   # color of our 2oshat
 YELLOW = (255, 255, 0)  # value for yellow  #color of ai 2oshat
@@ -165,28 +165,27 @@ def game():
 
     # turn = random.randint(player, ai)  # makes a random start of player or ai
     turn = 0
-    #**************************************************
+    # **************************************************
     game = main.Game()
     state = game.start()
     main.print_board(state)
-    #***************************************************
+    # ***************************************************
 
     while not game_over:
-
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
 
             if event.type == pygame.MOUSEMOTION:
-                pygame.draw.rect(screen, BLACK, (0, 0, width, square_size))  # BETRG3HA BLACK
+                pygame.draw.rect(screen, SHADOW, (0, 0, width, square_size))  # BETRG3HA BLACK
                 posx = event.pos[0]
                 if turn == player:
                     pygame.draw.circle(screen, RED, (posx, int(square_size / 2)), RADIUS)
             pygame.display.update()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pygame.draw.rect(screen, BLACK, (0, 0, width, square_size))
+                pygame.draw.rect(screen, SHADOW, (0, 0, width, square_size))
                 # print(event.pos)
                 # Ask for Player 1 Input
                 if turn == player:
@@ -197,7 +196,7 @@ def game():
                         row = get_next_open_row(board, col)
                         drop_piece(board, row, col, pl_piece)
                         state = main.set_chip(state, col, row, '1')
-                        #main.space_tracker[(col, row)] = 1
+                        # main.space_tracker[(col, row)] = 1
                         print("PLAYER TURN")
                         main.print_board(state)
                         print('\n')
@@ -219,7 +218,7 @@ def game():
                     runtime = (time.time() - start_time)
                     i = index[0]
                     j = index[1]
-                    #main.space_tracker[(i, j)] = 1
+                    # main.space_tracker[(i, j)] = 1
                     drop_piece(board, j, i, ai_piece)
                 else:
                     start_time = time.time()
@@ -227,7 +226,7 @@ def game():
                     runtime = (time.time() - start_time)
                     i = index[0]
                     j = index[1]
-                    #main.space_tracker[(i, j)] = 1
+                    # main.space_tracker[(i, j)] = 1
                     drop_piece(board, j, i, ai_piece)
                 # *****************************************************************
                 if main.terminal_test(state):
@@ -247,13 +246,14 @@ def game():
                 print('\n')
                 print('NODES EXPANDED BY MINIMAX', main.nodes_expanded)
                 print('RUNTIME: ', runtime)
-                print('PLAYER SCORE= ',main.red_score(state),'   ','AI SCORE= ',main.yellow_score(state),'\n')
+                print('PLAYER SCORE= ', main.red_score(state), '   ', 'AI SCORE= ', main.yellow_score(state), '\n')
                 # BET5ALY EL TURN YA 0 YA 1
                 turn += 1
                 turn = turn % 2
         if game_over:
             pygame.time.wait(5000)  # WAITS 3000 MILISECONDS
             sys.exit()
+
 
 minimax_depth = int(input('Enter Depth of minimax tree: '))
 game_intro()
