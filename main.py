@@ -4,13 +4,18 @@
 # j is row
 # i is column
 import math
+
 nodes_expanded = 0
 space_tracker = {}
+
+
 def initialize_dict(dict):
     for i in range(0, 7):
         for j in range(0, 6):
             dict.update({(i, j): 0})
     return dict
+
+
 class Game:
     def __init__(self):
         self.red_score = 0
@@ -20,6 +25,7 @@ class Game:
     def start(self):
         board = ['000000', '000000', '000000', '000000', '000000', '000000', '000000']
         return board
+
     # def over(self):
     #     if terminal_test(board):
     #         return 1
@@ -32,13 +38,16 @@ class Game:
             return 2
         else:
             return 0
-#THIS CLASS IS ONLY USED TO TRANSFER THE INDEX OF THE AI'S MOVE TO THE GUI
+
+
+# THIS CLASS IS ONLY USED TO TRANSFER THE INDEX OF THE AI'S MOVE TO THE GUI
 class Child:
     def __init__(self, state, index):
         self.state = state
         self.index = index
 
-#TAKES AN INPUT STATE AND GENERATES ALL POSSIBLE MOVES FROM THIS STATE
+
+# TAKES AN INPUT STATE AND GENERATES ALL POSSIBLE MOVES FROM THIS STATE
 def state_children(state, val):
     children = []
     indices = []
@@ -52,7 +61,6 @@ def state_children(state, val):
 
                 break
 
-
     return (children)
 
 
@@ -65,17 +73,20 @@ def detect_four_vertically(column, val):
                 return 1
         else:
             k = 4
+
+
 def detect_3_vertically(column, val):
     k = 3
     for j in range(0, 6):
         if get_chip(column, j) == val:
             k -= 1
-            if k == 0 and j<=4 and get_chip(column, j+1) == '0':
+            if k == 0 and j <= 4 and get_chip(column, j + 1) == '0':
                 return 1
-            elif k == 1 and j<=4 and get_chip(column, j+1) == '0':
+            elif k == 1 and j <= 4 and get_chip(column, j + 1) == '0':
                 return 2
         else:
             k = 3
+
 
 def vertical_4_count(state, val):
     count = 0
@@ -84,15 +95,16 @@ def vertical_4_count(state, val):
             count += 1
     return count
 
+
 def vertical_3_count(state, val):
     count3 = 0
     count2 = 0
     for column in state:
-        x = detect_3_vertically(column,val)
+        x = detect_3_vertically(column, val)
         if x == 1:
             count3 += 1
-        elif x ==2:
-            count2 +=1
+        elif x == 2:
+            count2 += 1
 
     return (count2, count3)
 
@@ -106,22 +118,23 @@ def detect_four_horizontally(state, row, val):
                 return 1
         else:
             k = 4
+
+
 def detect_three_horizontally(state, row, val):
     k = 3
     for i in range(0, 7):
         if get_chip(state[i], row) == val:
             k -= 1
-            if k == 0 and i <= 5 and state[i+1][row] == '0' and i >= 3 and state[i-3][row] == '0':
+            if k == 0 and i <= 5 and state[i + 1][row] == '0' and i >= 3 and state[i - 3][row] == '0':
                 return 2
-            elif k == 0 and i <=5 and state[i+1][row] == '0':
+            elif k == 0 and i <= 5 and state[i + 1][row] == '0':
 
                 return 1
-            elif k == 0 and i >= 3 and state[i-3][row] == '0':
+            elif k == 0 and i >= 3 and state[i - 3][row] == '0':
                 return 1
 
         else:
             k = 3
-
 
 
 def horizontal_4_count(state, val):
@@ -130,6 +143,7 @@ def horizontal_4_count(state, val):
         if detect_four_horizontally(state, j, val):
             count += 1
     return count
+
 
 def horizontal_3_count(state, val):
     count = 0
@@ -143,42 +157,147 @@ def horizontal_3_count(state, val):
 
 def downtoup_diagonal_count(state, value):
     connected_fours = 0
+    i = 2
+    count = 0
     for j in range(4):
-        for i in range(3):
-            jd = j
-            id = i
+        if state[j][i] == value:
+            count += 1
+        else:
             count = 0
-            four_in_a_row = True
-            while count < 4:
-                if state[jd][id] != value:
-                    four_in_a_row = False
-                    break
-                count += 1
-                jd += 1
-                id += 1
-            if four_in_a_row:
-                connected_fours += 1
+        if count == 4:
+            connected_fours += 1
+            break
+        i += 1
+    i = 1
+    count = 0
+    for j in range(5):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i += 1
+    i = 0
+    count = 0
+    for j in range(6):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i += 1
+    i = 0
+    count = 0
+    for j in range(1, 7):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i += 1
+    i = 0
+    count = 0
+    for j in range(2, 7):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i += 1
+
+    i = 0
+    count = 0
+    for j in range(3, 7):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i += 1
     return connected_fours
 
 
 def uptodown_diagonal_count(state, value):
     connected_fours = 0
+    i = 3
+    count = 0
     for j in range(4):
-        for i in range(3, 6):
-            jd = j
-            id = i
+        if state[j][i] == value:
+            count += 1
+        else:
             count = 0
-            four_in_a_row = True
-            while count < 4:
-                if state[jd][id] != value:
-                    four_in_a_row = False
-                    break
-                count += 1
-                jd += 1
-                id -= 1
-            if four_in_a_row:
-                connected_fours += 1
+        if count == 4:
+            connected_fours += 1
+            break
+        i -= 1
+    i = 4
+    count = 0
+    for j in range(5):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i -= 1
+    i = 5
+    count = 0
+    for j in range(6):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i -= 1
+    i = 5
+    count = 0
+    for j in range(1, 7):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i -= 1
+    i = 5
+    count = 0
+    for j in range(2, 7):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i -= 1
+
+    i = 5
+    count = 0
+    for j in range(3, 7):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i -= 1
     return connected_fours
+
 
 def red_3_score(state):
     (x, y) = vertical_3_count(state, '1')
@@ -189,6 +308,7 @@ def yellow_3_score(state):
     (x, y) = vertical_3_count(state, '2')
     return horizontal_3_count(state, '2') + y
 
+
 def red_2_score(state):
     (x, y) = vertical_3_count(state, '1')
     return x
@@ -198,22 +318,26 @@ def yellow_2_score(state):
     (x, y) = vertical_3_count(state, '2')
     return x
 
+
 def red_score(state):
-    return horizontal_4_count(state, '1') + vertical_4_count(state, '1') + uptodown_diagonal_count(state, '1') + downtoup_diagonal_count(state, '1')
+    return horizontal_4_count(state, '1') + vertical_4_count(state, '1') + uptodown_diagonal_count(state,
+                                                                                                   '1') + downtoup_diagonal_count(
+        state, '1')
 
 
 def yellow_score(state):
-    return horizontal_4_count(state, '2') + vertical_4_count(state, '2') + uptodown_diagonal_count(state, '2') + downtoup_diagonal_count(state, '2')
+    return horizontal_4_count(state, '2') + vertical_4_count(state, '2') + uptodown_diagonal_count(state,
+                                                                                                   '2') + downtoup_diagonal_count(
+        state, '2')
 
 
 def evaluate(state):
-    x = yellow_score(state)*20
-    y = red_score(state)*-20
-    z = red_3_score(state)*-8
-    a = yellow_3_score(state)*8
-    d = red_2_score(state)*-5
-    c = yellow_2_score(state)*5
-
+    x = yellow_score(state) * 20
+    y = red_score(state) * -20
+    z = red_3_score(state) * -8
+    a = yellow_3_score(state) * 8
+    d = red_2_score(state) * -5
+    c = yellow_2_score(state) * 5
 
     return x + y + z + a + d + c
 
@@ -229,6 +353,8 @@ def terminal_test(state):
 # ********************************** MINIMAX WITH ALPHA BETA PRUNING ***************************************************
 
 minimax_tree = []
+
+
 def decisionwp(state, depth):
     global nodes_expanded
     nodes_expanded = 0
@@ -239,10 +365,10 @@ def decisionwp(state, depth):
 def minimizewp(state, alpha, beta, steps_count):
     global nodes_expanded
     if terminal_test(state):
-        return (None, evaluate(state),None)
+        return (None, evaluate(state), None)
     if steps_count == 0:
         value = evaluate(state)
-        return (None, value,None)
+        return (None, value, None)
     (minChild, minUtility, index) = (None, 500, None)
     steps_count -= 1
 
@@ -255,7 +381,6 @@ def minimizewp(state, alpha, beta, steps_count):
             break
         if minUtility < beta:
             beta = minUtility
-
 
     return (minChild, minUtility, index)
 
@@ -280,11 +405,10 @@ def maximizewp(state, alpha, beta, steps_count):
         if maxUtility > alpha:
             alpha = maxUtility
 
-
     return (maxChild, maxUtility, index)
 
 
-#*************************************** MINIMAX *******************************************************
+# *************************************** MINIMAX *******************************************************
 
 def maximize(state, steps_count):
     global nodes_expanded
@@ -305,7 +429,7 @@ def maximize(state, steps_count):
     return (maxChild, maxUtility, index)
 
 
-def minimize(state,steps_count):
+def minimize(state, steps_count):
     global nodes_expanded
     if terminal_test(state):
         return (None, evaluate(state), None)
@@ -360,10 +484,11 @@ def set_chip(state, i, j, val):
 
 def print_board(state):
     for j in range(5, -1, -1):
-        print(get_chip(state[0], j), '', get_chip(state[1], j), '', get_chip(state[2], j), '', get_chip(state[3], j), '',
+        print(get_chip(state[0], j), '', get_chip(state[1], j), '', get_chip(state[2], j), '', get_chip(state[3], j),
+              '',
               get_chip(state[4], j), '', get_chip(state[5], j), '', get_chip(state[6], j))
 
-#space_tracker = initialize_dict(space_tracker)
+# space_tracker = initialize_dict(space_tracker)
 
 # game = Game()
 # board = game.start()
