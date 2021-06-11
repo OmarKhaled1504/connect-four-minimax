@@ -114,7 +114,7 @@ def game_intro():
 
 
 def game():
-    global minimax_depth, runtime
+    global runtime
 
     def create_board():
         board = connect4.zeros((ROW_COUNT, COLUMN_COUNT))  # matrix of zeros 6 x 7
@@ -213,7 +213,7 @@ def game():
                 row = get_next_open_row(board, col)
                 if pr:
                     start_time = time.time()
-                    (state, index) = main.decisionwp(state, minimax_depth)
+                    (state, index) = main.decisionwp(state, main.minimax_depth)
                     t2 = time.localtime()
                     runtime = (time.time() - start_time)
                     i = index[0]
@@ -222,7 +222,7 @@ def game():
                     drop_piece(board, j, i, ai_piece)
                 else:
                     start_time = time.time()
-                    (state, index) = main.decision(state, minimax_depth)
+                    (state, index) = main.decision(state, main.minimax_depth)
                     runtime = (time.time() - start_time)
                     i = index[0]
                     j = index[1]
@@ -254,6 +254,4 @@ def game():
             pygame.time.wait(5000)  # WAITS 3000 MILISECONDS
             sys.exit()
 
-
-minimax_depth = int(input('Enter Depth of minimax tree: '))
 game_intro()

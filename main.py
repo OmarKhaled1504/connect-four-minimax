@@ -4,6 +4,7 @@
 # j is row
 # i is column
 import math
+minimax_depth = 0
 nodes_expanded = 0
 space_tracker = {}
 def initialize_dict(dict):
@@ -143,43 +144,146 @@ def horizontal_3_count(state, val):
 
 def downtoup_diagonal_count(state, value):
     connected_fours = 0
+    i = 2
+    count = 0
     for j in range(4):
-        for i in range(3):
-            jd = j
-            id = i
+        if state[j][i] == value:
+            count += 1
+        else:
             count = 0
-            four_in_a_row = True
-            while count < 4:
-                if state[jd][id] != value:
-                    four_in_a_row = False
-                    break
-                count += 1
-                jd += 1
-                id += 1
-            if four_in_a_row:
-                connected_fours += 1
+        if count == 4:
+            connected_fours += 1
+            break
+        i += 1
+    i = 1
+    count = 0
+    for j in range(5):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i += 1
+    i = 0
+    count = 0
+    for j in range(6):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i += 1
+    i = 0
+    count = 0
+    for j in range(1, 7):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i += 1
+    i = 0
+    count = 0
+    for j in range(2, 7):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i += 1
+
+    i = 0
+    count = 0
+    for j in range(3, 7):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i += 1
     return connected_fours
 
 
 def uptodown_diagonal_count(state, value):
     connected_fours = 0
+    i = 3
+    count = 0
     for j in range(4):
-        for i in range(3, 6):
-            jd = j
-            id = i
+        if state[j][i] == value:
+            count += 1
+        else:
             count = 0
-            four_in_a_row = True
-            while count < 4:
-                if state[jd][id] != value:
-                    four_in_a_row = False
-                    break
-                count += 1
-                jd += 1
-                id -= 1
-            if four_in_a_row:
-                connected_fours += 1
-    return connected_fours
+        if count == 4:
+            connected_fours += 1
+            break
+        i -= 1
+    i = 4
+    count = 0
+    for j in range(5):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i -= 1
+    i = 5
+    count = 0
+    for j in range(6):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i -= 1
+    i = 5
+    count = 0
+    for j in range(1, 7):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i -= 1
+    i = 5
+    count = 0
+    for j in range(2, 7):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i -= 1
 
+    i = 5
+    count = 0
+    for j in range(3, 7):
+        if state[j][i] == value:
+            count += 1
+        else:
+            count = 0
+        if count == 4:
+            connected_fours += 1
+            break
+        i -= 1
+    return connected_fours
 def red_3_score(state):
     (x, y) = vertical_3_count(state, '1')
     return horizontal_3_count(state, '1') + y
@@ -362,7 +466,7 @@ def print_board(state):
     for j in range(5, -1, -1):
         print(get_chip(state[0], j), '', get_chip(state[1], j), '', get_chip(state[2], j), '', get_chip(state[3], j), '',
               get_chip(state[4], j), '', get_chip(state[5], j), '', get_chip(state[6], j))
-
+minimax_depth = int(input('Enter Depth of minimax tree: '))
 #space_tracker = initialize_dict(space_tracker)
 
 # game = Game()
