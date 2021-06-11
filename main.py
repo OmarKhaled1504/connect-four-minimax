@@ -466,7 +466,6 @@ def print_board(state):
     for j in range(5, -1, -1):
         print(get_chip(state[0], j), '', get_chip(state[1], j), '', get_chip(state[2], j), '', get_chip(state[3], j), '',
               get_chip(state[4], j), '', get_chip(state[5], j), '', get_chip(state[6], j))
-minimax_depth = int(input('Enter Depth of minimax tree: '))
 #space_tracker = initialize_dict(space_tracker)
 
 # game = Game()
