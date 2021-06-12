@@ -121,7 +121,7 @@ def game_intro():
 
         gameDisplay.fill(SHADOW)
 
-        TextSurf1 , TextRect1  = text_objects("CONNECT 4", largeText)
+        TextSurf1, TextRect1 = text_objects("CONNECT 4", largeText)
         TextRect1.center = ((display_width / 2), (display_height / 4))
         gameDisplay.blit(TextSurf1, TextRect1)
         TextSurf2, TextRect2 = text_objects("ENTER THE MINIMAX DEPTH", smallText)
@@ -147,8 +147,9 @@ def game():
 
     if z > 7:
         z = 7
-    else:
-        z = z
+    elif z == 0:
+        z = 1
+
     global runtime
 
     def create_board():
@@ -158,10 +159,10 @@ def game():
     def drop_piece(board, row, col, piece):
         board[row][col] = piece
 
-    def is_valid_location(board , col):
+    def is_valid_location(board, col):
         return board[ROW_COUNT - 1][col] == 0
 
-    def get_next_open_row(board , col):
+    def get_next_open_row(board, col):
         for r in range(ROW_COUNT):
             if board[r][col] == 0:
                 return r
@@ -249,7 +250,7 @@ def game():
                 if pr:
                     start_time = time.time()
                     print(z)
-                    (state, index) = main.decisionwp(state,z)
+                    (state, index) = main.decisionwp(state, z)
                     print(int(user_text))
                     t2 = time.localtime()
                     runtime = (time.time() - start_time)
@@ -268,15 +269,18 @@ def game():
                 # *****************************************************************
                 if main.terminal_test(state):
                     if main.red_score(state) < main.yellow_score(state):
-                        label = mediumText.render("AI WINS!!", True, BLACK)
+                        label = mediumText.render(f"AI WINS!!  red ={main.red_score(state)} "
+                                                  f" yellow ={main.yellow_score(state)}", True, BLACK)
                         screen.blit(label, (40, 10))
                         game_over = True
                     elif main.red_score(state) > main.yellow_score(state):
-                        label = mediumText.render("PLAYER WINS!!", True, BLACK)
+                        label = mediumText.render(f"PLAYER WINS!! yellow ={main.yellow_score(state)} "
+                                                  f"red ={main.red_score(state)} ", True, BLACK)
                         screen.blit(label, (40, 10))
                         game_over = True
-                    else :
-                        label = mediumText.render("DRAW!!", True, BLACK)
+                    else:
+                        label = mediumText.render(f"DRAW!!  red ={main.red_score(state)} "
+                                                  f" yellow ={main.yellow_score(state)}", True, BLACK)
                         screen.blit(label, (40, 10))
                         game_over = True
                 # print_board(board)
@@ -291,7 +295,7 @@ def game():
                 turn += 1
                 turn = turn % 2
         if game_over:
-            pygame.time.wait(8000)  # WAITS 5000 MILISECONDS
+            pygame.time.wait(5000)  # WAITS 5000 MILISECONDS
             sys.exit()
 
 
