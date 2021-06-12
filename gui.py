@@ -295,7 +295,7 @@ def game():
                 turn += 1
                 turn = turn % 2
         if game_over:
-            pygame.time.wait(5000)  # WAITS 5000 MILISECONDS
+            pygame.time.wait(4000)  # WAITS 5000 MILISECONDS
             sys.exit()
 
 
