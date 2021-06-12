@@ -7,15 +7,6 @@ import math
 
 minimax_depth = 0
 nodes_expanded = 0
-space_tracker = {}
-
-
-def initialize_dict(dict):
-    for i in range(0, 7):
-        for j in range(0, 6):
-            dict.update({(i, j): 0})
-    return dict
-
 
 class Game:
     def __init__(self):
@@ -27,11 +18,6 @@ class Game:
         board = ['000000', '000000', '000000', '000000', '000000', '000000', '000000']
         return board
 
-    # def over(self):
-    #     if terminal_test(board):
-    #         return 1
-    #     else:
-    #         return 0
     def winner(self):
         if self.red_score > self.yellow_score:
             return 1
@@ -64,7 +50,7 @@ def state_children(state, val):
 
     return (children)
 
-
+#************************** THESE FUNCTIONS DETECT CONNECTED 4,3,2 ******************************************************
 def detect_four_vertically(column, val):
     k = 4
     for j in range(0, 6):
@@ -299,39 +285,42 @@ def uptodown_diagonal_count(state, value):
         i -= 1
     return connected_fours
 
+# ***************************************** THESE FUNCTIONS ARE USED FOR EVALUATING BOARDS **********************************************
 
+# RETURNS THE NUMBER OF CONNECTED 3 FOR RED
 def red_3_score(state):
+
     (x, y) = vertical_3_count(state, '1')
     return horizontal_3_count(state, '1') + y
 
-
+# RETURNS THE NUMBER OF CONNECTED 3 FOR YELLOW
 def yellow_3_score(state):
     (x, y) = vertical_3_count(state, '2')
     return horizontal_3_count(state, '2') + y
 
-
+# RETURNS THE NUMBER OF CONNECTED 2 FOR RED
 def red_2_score(state):
     (x, y) = vertical_3_count(state, '1')
     return x
 
-
+# RETURNS THE NUMBER OF CONNECTED 2 FOR YELLOW
 def yellow_2_score(state):
     (x, y) = vertical_3_count(state, '2')
     return x
 
-
+# RETURNS THE NUMBER OF CONNECTED 4 FOR RED
 def red_score(state):
     return horizontal_4_count(state, '1') + vertical_4_count(state, '1') + uptodown_diagonal_count(state,
                                                                                                    '1') + downtoup_diagonal_count(
         state, '1')
 
-
+# RETURNS THE NUMBER OF CONNECTED 4 FOR YELLOW
 def yellow_score(state):
     return horizontal_4_count(state, '2') + vertical_4_count(state, '2') + uptodown_diagonal_count(state,
                                                                                                    '2') + downtoup_diagonal_count(
         state, '2')
 
-
+# HEURISTIC PRUNING, RETURNS A VALUE EVALUATING THE STATE
 def evaluate(state):
     x = yellow_score(state) * 20
     y = red_score(state) * -20
@@ -342,7 +331,7 @@ def evaluate(state):
 
     return x + y + z + a + d + c
 
-
+# CHECKS IF THE GAME IS OVER
 def terminal_test(state):
     for i in range(0, 7):
         for j in range(0, 6):
@@ -450,7 +439,7 @@ def decision(state, depth):
     nodes_expanded = 0
     (child, temp, index) = maximize(state, depth)
     return (child, index)
-
+# ***********************************************************************************************************
 
 def get_chip(column, j):
     word = split(column)
@@ -485,14 +474,3 @@ def print_board(state):
         print(get_chip(state[0], j), '', get_chip(state[1], j), '', get_chip(state[2], j), '', get_chip(state[3], j),
               '',
               get_chip(state[4], j), '', get_chip(state[5], j), '', get_chip(state[6], j))
-# space_tracker = initialize_dict(space_tracker)
-
-# game = Game()
-# board = game.start()
-# print_board(board)
-# (board , index) = decisionwp(board)
-# print_board(board)
-# (board , index) = decisionwp(board)
-# print_board(board)
-# (board , index) = decisionwp(board)
-# print_board(board)

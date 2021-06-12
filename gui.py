@@ -139,11 +139,16 @@ def game_intro():
         input_rect.w = max(30, text_surface.get_width() + 10)
 
         pygame.display.update()
-        # clock.tick(60)
+
 
 
 def game():
-    z = int(user_text)
+    if user_text == '':
+        z = 1
+    else:
+        z = int(user_text)
+
+
 
     if z > 7:
         z = 7
@@ -249,9 +254,7 @@ def game():
                 row = get_next_open_row(board, col)
                 if pr:
                     start_time = time.time()
-                    print(z)
                     (state, index) = main.decisionwp(state, z)
-                    print(int(user_text))
                     t2 = time.localtime()
                     runtime = (time.time() - start_time)
                     i = index[0]
@@ -295,7 +298,7 @@ def game():
                 turn += 1
                 turn = turn % 2
         if game_over:
-            pygame.time.wait(4000)  # WAITS 5000 MILISECONDS
+            pygame.time.wait(4000)  # WAITS 4000 MILISECONDS
             sys.exit()
 
 
