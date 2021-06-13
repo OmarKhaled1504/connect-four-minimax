@@ -157,6 +157,7 @@ def game():
 
     global runtime
 
+
     def create_board():
         board = connect4.zeros((ROW_COUNT, COLUMN_COUNT))  # matrix of zeros 6 x 7
         return board
@@ -263,6 +264,7 @@ def game():
                     drop_piece(board, j, i, ai_piece)
                 else:
                     start_time = time.time()
+                    main.minimax_tree.clear()
                     (state, index) = main.decision(state, z)
                     runtime = (time.time() - start_time)
                     i = index[0]
@@ -295,7 +297,6 @@ def game():
                 print('RUNTIME: ', runtime)
                 print('PLAYER SCORE= ', main.red_score(state), '   ', 'AI SCORE= ', main.yellow_score(state), '\n')
                 #main.generate_tree(main.minimax_tree)
-                #print(main.minimax_tree)
                 # BET5ALY EL TURN YA 0 YA 1
                 turn += 1
                 turn = turn % 2

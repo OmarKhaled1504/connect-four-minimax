@@ -499,17 +499,26 @@ def generate_tree(minimax_tree):
             one.append(minimax_tree[i])
         elif minimax_tree[i][1] == 0:
             zero.append(minimax_tree[i])
-    print(two)
-    print(one)
-    print(zero)
-    print(minimax_tree[0])
-    for i in range(0,7):
-        print(two[i], end = '')
+    #print(two)
+    #print(one)
+    #print(zero)
+    print('MAXIMIZER (DEPTH = 0):',minimax_tree[0][0])
     c = 0
-    print('\n')
+    d = 0
     for i in range(0, 7):
-        print(two[i])
-        for j in range(c, c+7):
-            print(one[j], end = '')
+        print('       ','                   ', 'MINIMIZER (DEPTH =',3-two[i][1], '):', two[i][0])
+
+        for j in range(c, c + 7):
+            print('       ', '       ','                      ','                      ', end='')
+            print('MAXIMIZER (DEPTH =', 3-one[i][1], '):', one[j][0], end='')
+            print('       ', '       ')
+            print('       ', '       ', '       ','       ','           ','           ','                                 ', end= '')
+            for k in range(d, d + 7):
+                print(zero[k][0], end='  ')
+            d += 7
+            print('')
+            print('\n')
         c += 7
         print('')
+
+
