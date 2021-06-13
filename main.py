@@ -346,6 +346,7 @@ def decisionwp(state, depth):
     global nodes_expanded
     nodes_expanded = 0
     (child, temp, index) = maximizewp(state, -math.inf, math.inf, depth)
+
     return (child, index)
 
 
@@ -385,6 +386,7 @@ def maximizewp(state, alpha, beta, steps_count):
     for child in state_children(state, '2'):
         nodes_expanded += 1
         (temp, utility, temp2) = minimizewp(child.state, alpha, beta, steps_count)
+
         if utility > maxUtility:
             (maxChild, maxUtility, index) = (child.state, utility, child.index)
         if maxUtility >= beta:
@@ -394,7 +396,7 @@ def maximizewp(state, alpha, beta, steps_count):
 
     return (maxChild, maxUtility, index)
 
-
+minimax_tree = []
 # *************************************** MINIMAX *******************************************************
 
 def maximize(state, steps_count):
@@ -410,6 +412,8 @@ def maximize(state, steps_count):
     for child in state_children(state, '2'):
         nodes_expanded += 1
         (temp, utility, temp2) = minimize(child.state, steps_count)
+        minimax_tree.append((utility, steps_count))
+
         if utility > maxUtility:
             (maxChild, maxUtility, index) = (child.state, utility, child.index)
 
@@ -417,6 +421,7 @@ def maximize(state, steps_count):
 
 
 def minimize(state, steps_count):
+
     global nodes_expanded
     if terminal_test(state):
         return (None, evaluate(state), None)
@@ -429,15 +434,18 @@ def minimize(state, steps_count):
     for child in state_children(state, '1'):
         nodes_expanded += 1
         (temp, utility, temp2) = maximize(child.state, steps_count)
+        minimax_tree.append((utility, steps_count))
         if utility < minUtility:
             (minChild, minUtility, index) = (child.state, utility, child.index)
+
     return (minChild, minUtility, index)
 
 
 def decision(state, depth):
     global nodes_expanded
     nodes_expanded = 0
-    (child, temp, index) = maximize(state, depth)
+    (child, utility, index) = maximize(state, depth)
+    minimax_tree.append((utility, depth))
     return (child, index)
 # ***********************************************************************************************************
 
@@ -474,3 +482,34 @@ def print_board(state):
         print(get_chip(state[0], j), '', get_chip(state[1], j), '', get_chip(state[2], j), '', get_chip(state[3], j),
               '',
               get_chip(state[4], j), '', get_chip(state[5], j), '', get_chip(state[6], j))
+
+
+
+
+def generate_tree(minimax_tree):
+    one = []
+    two = []
+    zero = []
+    minimax_tree.reverse()
+    for i in range(0, len(minimax_tree)):
+
+        if minimax_tree[i][1] == 2:
+            two.append(minimax_tree[i])
+        elif minimax_tree[i][1] == 1:
+            one.append(minimax_tree[i])
+        elif minimax_tree[i][1] == 0:
+            zero.append(minimax_tree[i])
+    print(two)
+    print(one)
+    print(zero)
+    print(minimax_tree[0])
+    for i in range(0,7):
+        print(two[i], end = '')
+    c = 0
+    print('\n')
+    for i in range(0, 7):
+        print(two[i])
+        for j in range(c, c+7):
+            print(one[j], end = '')
+        c += 7
+        print('')

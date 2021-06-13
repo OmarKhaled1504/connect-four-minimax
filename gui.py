@@ -294,6 +294,8 @@ def game():
                 print('NODES EXPANDED BY MINIMAX', main.nodes_expanded)
                 print('RUNTIME: ', runtime)
                 print('PLAYER SCORE= ', main.red_score(state), '   ', 'AI SCORE= ', main.yellow_score(state), '\n')
+                #main.generate_tree(main.minimax_tree)
+                #print(main.minimax_tree)
                 # BET5ALY EL TURN YA 0 YA 1
                 turn += 1
                 turn = turn % 2
